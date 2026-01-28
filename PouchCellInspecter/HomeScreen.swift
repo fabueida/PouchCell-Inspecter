@@ -6,34 +6,21 @@
 //
 
 import SwiftUI
-import Combine
-import PhotosUI
-
-// MARK: - Speech Settings Persistence (same key as MenuView)
-private enum SpeechSettingsStorage {
-    static let key = "speechSettingsData"
-
-    static func encode(_ settings: SpeechSettings) -> Data {
-        (try? JSONEncoder().encode(settings)) ?? Data()
-    }
-
-    static func decode(_ data: Data) -> SpeechSettings {
-        (try? JSONDecoder().decode(SpeechSettings.self, from: data)) ?? .default
-    }
-}
+import Photos
+import UIKit
 
 struct HomeScreen: View {
 
     @StateObject private var cameraManager = CameraPermissionManager()
+    @StateObject private var photoPermissionManager = PhotoPermissionManager()
 
     // MARK: - Menu
     @State private var showMenu = false
     @State private var showSafetyInfo = false
 
-    // MARK: - Camera & Photo Library
+    // MARK: - Camera & Photo
     @State private var showCamera = false
-    @State private var showPhotoPicker = false
-    @State private var selectedPhotoItem: PhotosPickerItem?
+    @State private var showUIKitPicker = false
     @State private var capturedImage: UIImage?
 
     // MARK: - ML & UI State
@@ -42,13 +29,6 @@ struct HomeScreen: View {
     @State private var showResult = false
 
     private let classifier = ImageClassifier()
-
-    // ✅ Load speech settings app-wide
-    @AppStorage(SpeechSettingsStorage.key) private var speechSettingsData: Data = SpeechSettingsStorage.encode(.default)
-
-    private var speechSettings: SpeechSettings {
-        SpeechSettingsStorage.decode(speechSettingsData)
-    }
 
     var body: some View {
         NavigationStack {
@@ -63,7 +43,8 @@ struct HomeScreen: View {
 
                     Spacer()
 
-                                        Button {
+                    // MARK: - Camera Button
+                    Button {
                         cameraManager.requestPermission()
                     } label: {
                         Label("Scan", systemImage: "camera.fill")
@@ -73,13 +54,12 @@ struct HomeScreen: View {
                             .padding(.vertical, 20)
                             .background(AppTheme.accent)
                             .cornerRadius(18)
-                            .accessibilityHint("Double tap to take a picture of your Lithium battery.")
                     }
                     .padding(.horizontal, 32)
 
-                    // MARK: - Secondary Action
+                    // MARK: - Import Button (NEW FLOW)
                     Button {
-                        showPhotoPicker = true
+                        photoPermissionManager.requestPermission()
                     } label: {
                         Label("Import from Library", systemImage: "photo.on.rectangle")
                             .font(.system(size: 17, weight: .medium))
@@ -93,7 +73,7 @@ struct HomeScreen: View {
                     }
                     .padding(.horizontal, 64)
 
-                    // MARK: - Safety Info (Informational)
+                    // MARK: - Safety Info
                     Button {
                         showSafetyInfo = true
                     } label: {
@@ -101,7 +81,6 @@ struct HomeScreen: View {
                             .font(.system(size: 15, weight: .medium))
                             .foregroundColor(.secondary)
                     }
-                    .padding(.top, 8)
 
                     Spacer()
                 }
@@ -109,7 +88,6 @@ struct HomeScreen: View {
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                // MARK: - Menu Button
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
                         showMenu = true
@@ -120,22 +98,31 @@ struct HomeScreen: View {
                 }
             }
         }
-        // MARK: - Menu
+
+        // MARK: - MENU
         .sheet(isPresented: $showMenu) {
             MenuView()
         }
-        // MARK: - Safety Info
+
+        // MARK: - SAFETY INFO
         .sheet(isPresented: $showSafetyInfo) {
             InfoDetailView(
                 title: "Safety Information",
                 message: "This app provides a visual inspection only and does not replace professional battery testing or safety procedures."
             )
         }
-        // MARK: - Camera Permission Handling
+
+        // MARK: - CAMERA PERMISSION RESULT
         .onChange(of: cameraManager.permissionGranted) { _, granted in
             if granted { showCamera = true }
         }
-        // MARK: - Camera
+
+        // MARK: - PHOTO PERMISSION RESULT
+        .onChange(of: photoPermissionManager.permissionGranted) { _, granted in
+            if granted { showUIKitPicker = true }
+        }
+
+        // MARK: - CAMERA SHEET
         .sheet(isPresented: $showCamera) {
             CameraView { image in
                 capturedImage = image
@@ -143,55 +130,45 @@ struct HomeScreen: View {
                 runClassification()
             }
         }
-        // MARK: - Photo Picker
-        .sheet(isPresented: $showPhotoPicker) {
-            NavigationStack {
-                PhotosPicker(
-                    selection: $selectedPhotoItem,
-                    matching: .images,
-                    photoLibrary: .shared()
-                ) {
-                    Text("Select a Photo")
-                        .font(.headline)
-                        .padding()
-                }
-                .navigationTitle("Import Photo")
-                .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button("Close") { showPhotoPicker = false }
-                    }
-                }
-            }
-            .onChange(of: selectedPhotoItem) { _, newItem in
-                guard let newItem else { return }
 
-                Task {
-                    if let data = try? await newItem.loadTransferable(type: Data.self),
-                       let image = UIImage(data: data) {
-                        capturedImage = image
-                        showPhotoPicker = false
-                        runClassification()
-                    }
-                }
+        // MARK: - PHOTO PICKER SHEET
+        .sheet(isPresented: $showUIKitPicker) {
+            ImagePicker { image in
+                capturedImage = image
+                runClassification()
             }
         }
-        // MARK: - Loading & Result
+
+        // MARK: - LOADING & RESULT
         .fullScreenCover(isPresented: $showLoading) {
             AnalysisLoadingScreen()
         }
         .fullScreenCover(isPresented: $showResult) {
             DetectionResultScreen(result: prediction ?? "Unknown")
         }
-        // MARK: - Camera Permission Alert
+
+        // MARK: - CAMERA DENIED ALERT
         .alert("Camera Access Required", isPresented: $cameraManager.showPermissionAlert) {
             Button("Open Settings") {
                 if let url = URL(string: UIApplication.openSettingsURLString) {
                     UIApplication.shared.open(url)
                 }
             }
-            Button("Cancel", role: .cancel) { }
+            Button("Cancel", role: .cancel) {}
         } message: {
             Text("We use the camera to inspect the battery for visible bulging.")
+        }
+
+        // MARK: - PHOTO DENIED ALERT
+        .alert("Photo Access Required", isPresented: $photoPermissionManager.showDeniedAlert) {
+            Button("Open Settings") {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Please allow photo access to import battery images for analysis.")
         }
     }
 
@@ -206,30 +183,9 @@ struct HomeScreen: View {
 
             DispatchQueue.main.async {
                 showLoading = false
-
-                let label = result ?? "Unable to analyze image"
-                prediction = label
+                prediction = result ?? "Unable to analyze image"
                 showResult = true
-
-                // ✅ Self-voicing result (separate from VoiceOver)
-                let speakText = speechText(for: label)
-                SpeechManager.shared.speak(speakText, settings: speechSettings)
             }
         }
     }
-
-    // MARK: - Speakable Result Copy
-    private func speechText(for label: String) -> String {
-        switch label.lowercased() {
-        case "normal":
-            return "Result: normal. No visible bulging detected."
-        case "bulging":
-            return "Result: bulging detected. Please handle the battery with caution."
-        case "unable to analyze image":
-            return "Result unavailable. The image could not be analyzed."
-        default:
-            return "Result: \(label)."
-        }
-    }
 }
-

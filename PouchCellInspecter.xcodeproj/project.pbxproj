@@ -15,6 +15,8 @@
 		8846F77F2F2407F00011F803 /* SpeechSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8846F77E2F2407F00011F803 /* SpeechSettings.swift */; };
 		886540D12EE681A70010D08D /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 886540D02EE681A70010D08D /* OnboardingView.swift */; };
 		888364702F200CAA00CB5773 /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8883646F2F200CAA00CB5773 /* MenuView.swift */; };
+		88B6C9892F2964A300AEC090 /* PhotoPermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B6C9882F2964A300AEC090 /* PhotoPermissionManager.swift */; };
+		88B6C98B2F29651E00AEC090 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B6C98A2F29651E00AEC090 /* ImagePicker.swift */; };
 		DC34875A2EF1F5750006D3AE /* AllViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3487512EF1F5750006D3AE /* AllViews.swift */; };
 /* End PBXBuildFile section */
 
@@ -38,11 +40,20 @@
 		886540D02EE681A70010D08D /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		8883646F2F200CAA00CB5773 /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		888AF1352ED64B9500EB16CC /* PouchCellInspecter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PouchCellInspecter.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		88B6C9882F2964A300AEC090 /* PhotoPermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPermissionManager.swift; sourceTree = "<group>"; };
+		88B6C98A2F29651E00AEC090 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		DC3487512EF1F5750006D3AE /* AllViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllViews.swift; sourceTree = "<group>"; };
 		DC46066D2EF00788005EB67B /* PouchCellInspecterTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PouchCellInspecterTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		88B6C9872F29600900AEC090 /* Exceptions for "PouchCellInspecter" folder in "PouchCellInspecter" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 888AF1342ED64B9500EB16CC /* PouchCellInspecter */;
+		};
 		DC4606762EF008C1005EB67B /* Exceptions for "PouchCellInspecterTests" folder in "PouchCellInspecter" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -63,6 +74,7 @@
 		888AF1372ED64B9500EB16CC /* PouchCellInspecter */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				88B6C9872F29600900AEC090 /* Exceptions for "PouchCellInspecter" folder in "PouchCellInspecter" target */,
 				DCB71C8C2EF0DE5B00AFE0AD /* Exceptions for "PouchCellInspecter" folder in "PouchCellInspecterTests" target */,
 			);
 			path = PouchCellInspecter;
@@ -99,6 +111,8 @@
 		888AF12C2ED64B9500EB16CC = {
 			isa = PBXGroup;
 			children = (
+				88B6C9882F2964A300AEC090 /* PhotoPermissionManager.swift */,
+				88B6C98A2F29651E00AEC090 /* ImagePicker.swift */,
 				8883646F2F200CAA00CB5773 /* MenuView.swift */,
 				8846F77C2F2407BA0011F803 /* SpeechManager.swift */,
 				8846F77E2F2407F00011F803 /* SpeechSettings.swift */,
@@ -239,6 +253,8 @@
 				888364702F200CAA00CB5773 /* MenuView.swift in Sources */,
 				882919952EECB76F0050C8A8 /* CameraPermissionManager.swift in Sources */,
 				DC34875A2EF1F5750006D3AE /* AllViews.swift in Sources */,
+				88B6C98B2F29651E00AEC090 /* ImagePicker.swift in Sources */,
+				88B6C9892F2964A300AEC090 /* PhotoPermissionManager.swift in Sources */,
 				8806F3B92EE0B0B50082B105 /* CameraView.swift in Sources */,
 				886540D12EE681A70010D08D /* OnboardingView.swift in Sources */,
 			);
@@ -393,7 +409,9 @@
 				DEVELOPMENT_TEAM = 748PM6VCVK;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PouchCellInspecter/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "“We use the camera to take a picture of your battery to determine if your battery is bulging.”";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This allows the app to analyze lithium-ion pouch batteries and provide safety-related information.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -427,7 +445,9 @@
 				DEVELOPMENT_TEAM = 748PM6VCVK;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PouchCellInspecter/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "“We use the camera to take a picture of your battery to determine if your battery is bulging.”";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This allows the app to analyze lithium-ion pouch batteries and provide safety-related information.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
