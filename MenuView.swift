@@ -32,7 +32,6 @@ enum AppAppearance: String, CaseIterable, Identifiable {
     }
 }
 
-// MARK: - Speech Settings Persistence (AppStorage via Data)
 private enum SpeechSettingsStorage {
     static let key = "speechSettingsData"
 
@@ -49,11 +48,9 @@ struct MenuView: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    // ✅ REAL state (not .constant)
-    @AppStorage("appAppearance") private var appearance: AppAppearance = .system
+        @AppStorage("appAppearance") private var appearance: AppAppearance = .system
 
-    // ✅ Persist speech settings
-    @AppStorage(SpeechSettingsStorage.key) private var speechSettingsData: Data = SpeechSettingsStorage.encode(.default)
+        @AppStorage(SpeechSettingsStorage.key) private var speechSettingsData: Data = SpeechSettingsStorage.encode(.default)
 
     @State private var isTestingSpeech = false
 
@@ -65,8 +62,7 @@ struct MenuView: View {
     private var availableVoices: [AVSpeechSynthesisVoice] {
         AVSpeechSynthesisVoice.speechVoices()
             .sorted { lhs, rhs in
-                // stable, readable ordering
-                (lhs.language, lhs.name) < (rhs.language, rhs.name)
+                                (lhs.language, lhs.name) < (rhs.language, rhs.name)
             }
     }
 
@@ -74,8 +70,7 @@ struct MenuView: View {
         NavigationStack {
             List {
 
-                // MARK: - Safety
-                Section("Safety") {
+                                Section("Safety") {
                     NavigationLink("Battery inspection disclaimer") {
                         InfoDetailView(
                             title: "Safety Disclaimer",
@@ -140,8 +135,7 @@ struct MenuView: View {
                                 )
                             }
 
-                            // Voice picker
-                            VStack(alignment: .leading, spacing: 6) {
+                                                        VStack(alignment: .leading, spacing: 6) {
                                 Text("Voice")
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
@@ -177,8 +171,7 @@ struct MenuView: View {
                     }
                 }
 
-                // MARK: - Appearance
-                Section("Appearance") {
+                                Section("Appearance") {
                     Picker("App appearance", selection: $appearance) {
                         ForEach(AppAppearance.allCases) { option in
                             Text(option.title).tag(option)
@@ -186,8 +179,7 @@ struct MenuView: View {
                     }
                 }
 
-                // MARK: - About
-                Section("About") {
+                                Section("About") {
                     if let version = Bundle.main
                         .infoDictionary?["CFBundleShortVersionString"] as? String {
 
@@ -219,7 +211,6 @@ struct MenuView: View {
     }
 }
 
-// MARK: - Info Screen
 struct InfoDetailView: View {
     let title: String
     let message: String

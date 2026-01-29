@@ -1,6 +1,6 @@
 //
-//  ImageClassifier.swift
-//  placeholder
+//  Homescreen.swift
+//  PouchCellInspecter
 //
 //  Created by Firas Abueida on 11/26/25.
 //

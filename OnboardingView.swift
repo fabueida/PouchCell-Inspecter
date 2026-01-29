@@ -1,3 +1,10 @@
+//
+//  OnboardingView.swift.swift
+//  PouchCellInspecter
+//
+//  Created by Firas Abueida on 12/7/25.
+//
+
 import SwiftUI
 
 struct OnboardingView: View {
@@ -7,15 +14,15 @@ struct OnboardingView: View {
     var body: some View {
         VStack(spacing: 24) {
 
-            Text("Welcome to Pouch Cell Inspector")
+            Text("Welcome to Pouch Cell Inspector!")
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .multilineTextAlignment(.center)
 
-            Text("Use the camera to identify if your lithium ion battery is normal.")
+            Text("Use the camera to identify the status of your lithium ion battery.")
                 .multilineTextAlignment(.center)
 
-            Text("Simply take a picture and it will give you information about your lithium ion battery. Tap continue to get started.")
+            Text("Simply take a picture of a lithium ion pouch battery and it will give you information to determine if your battery is in one of the following conditions, normal, bulging, unknown, etc. You can also save pictures of a lithium ion pouch battery, and then browse thru your photo library and also get a result in a similar fashion. Tap continue to get started.")
                 .font(.body)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)

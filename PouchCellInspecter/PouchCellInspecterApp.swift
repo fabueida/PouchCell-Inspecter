@@ -2,9 +2,10 @@ import SwiftUI
 
 @main
 struct PouchCellInspectorApp: App {
+    
     var body: some Scene {
         WindowGroup {
-            RootView()
+            RootView()   // Controls onboarding vs main app
         }
     }
 }
