@@ -18,6 +18,7 @@
 		88ACF8892F2AB95F00C00B33 /* OnboardingPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88ACF8882F2AB95F00C00B33 /* OnboardingPageView.swift */; };
 		88B6C9892F2964A300AEC090 /* PhotoPermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B6C9882F2964A300AEC090 /* PhotoPermissionManager.swift */; };
 		88B6C98B2F29651E00AEC090 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B6C98A2F29651E00AEC090 /* ImagePicker.swift */; };
+		88C3163B2F2BDC1F004DDDF7 /* SpeechFeedbackTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88C3163A2F2BDC1F004DDDF7 /* SpeechFeedbackTip.swift */; };
 		DC34875A2EF1F5750006D3AE /* AllViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3487512EF1F5750006D3AE /* AllViews.swift */; };
 /* End PBXBuildFile section */
 
@@ -44,6 +45,7 @@
 		88ACF8882F2AB95F00C00B33 /* OnboardingPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPageView.swift; sourceTree = "<group>"; };
 		88B6C9882F2964A300AEC090 /* PhotoPermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPermissionManager.swift; sourceTree = "<group>"; };
 		88B6C98A2F29651E00AEC090 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
+		88C3163A2F2BDC1F004DDDF7 /* SpeechFeedbackTip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechFeedbackTip.swift; sourceTree = "<group>"; };
 		DC3487512EF1F5750006D3AE /* AllViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllViews.swift; sourceTree = "<group>"; };
 		DC46066D2EF00788005EB67B /* PouchCellInspecterTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PouchCellInspecterTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -113,6 +115,7 @@
 		888AF12C2ED64B9500EB16CC = {
 			isa = PBXGroup;
 			children = (
+				88C3163A2F2BDC1F004DDDF7 /* SpeechFeedbackTip.swift */,
 				88B6C9882F2964A300AEC090 /* PhotoPermissionManager.swift */,
 				88B6C98A2F29651E00AEC090 /* ImagePicker.swift */,
 				8883646F2F200CAA00CB5773 /* MenuView.swift */,
@@ -256,6 +259,7 @@
 				888364702F200CAA00CB5773 /* MenuView.swift in Sources */,
 				882919952EECB76F0050C8A8 /* CameraPermissionManager.swift in Sources */,
 				DC34875A2EF1F5750006D3AE /* AllViews.swift in Sources */,
+				88C3163B2F2BDC1F004DDDF7 /* SpeechFeedbackTip.swift in Sources */,
 				88ACF8892F2AB95F00C00B33 /* OnboardingPageView.swift in Sources */,
 				88B6C98B2F29651E00AEC090 /* ImagePicker.swift in Sources */,
 				88B6C9892F2964A300AEC090 /* PhotoPermissionManager.swift in Sources */,

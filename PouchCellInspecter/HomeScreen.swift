@@ -8,22 +8,21 @@
 import SwiftUI
 import Photos
 import UIKit
+import TipKit
 
 struct HomeScreen: View {
+
+    @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
+    @AppStorage("didAnnounceSpeechTip") private var didAnnounceSpeechTip = false
 
     @StateObject private var cameraManager = CameraPermissionManager()
     @StateObject private var photoPermissionManager = PhotoPermissionManager()
 
-    // MARK: - Menu
     @State private var showMenu = false
     @State private var showSafetyInfo = false
-
-    // MARK: - Camera & Photo
     @State private var showCamera = false
     @State private var showUIKitPicker = false
     @State private var capturedImage: UIImage?
-
-    // MARK: - ML & UI State
     @State private var prediction: String?
     @State private var showLoading = false
     @State private var showResult = false
@@ -31,6 +30,26 @@ struct HomeScreen: View {
     private let classifier = ImageClassifier()
 
     var body: some View {
+        Group {
+            if #available(iOS 17.0, *), hasSeenOnboarding {
+                mainContent
+                    .popoverTip(SpeechFeedbackTip())
+                    .onAppear { announceSpeechTipOnceIfNeeded() }
+            } else {
+                mainContent
+            }
+        }
+        .sheet(isPresented: $showMenu) { MenuView() }
+        .sheet(isPresented: $showSafetyInfo) {
+            InfoDetailView(
+                title: "Safety Information",
+                message: "This app provides a visual inspection only and does not replace professional battery testing."
+            )
+        }
+    }
+
+    // MARK: - UI
+    private var mainContent: some View {
         NavigationStack {
             ZStack {
                 AppTheme.background
@@ -43,7 +62,6 @@ struct HomeScreen: View {
 
                     Spacer()
 
-                    // MARK: - Camera Button
                     Button {
                         cameraManager.requestPermission()
                     } label: {
@@ -57,7 +75,6 @@ struct HomeScreen: View {
                     }
                     .padding(.horizontal, 32)
 
-                    // MARK: - Import Button (NEW FLOW)
                     Button {
                         photoPermissionManager.requestPermission()
                     } label: {
@@ -73,56 +90,32 @@ struct HomeScreen: View {
                     }
                     .padding(.horizontal, 64)
 
-                    // MARK: - Safety Info
                     Button {
                         showSafetyInfo = true
                     } label: {
                         Label("Safety Info", systemImage: "info.circle")
-                            .font(.system(size: 15, weight: .medium))
                             .foregroundColor(.secondary)
                     }
 
                     Spacer()
                 }
             }
-            .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        showMenu = true
-                    } label: {
+                    Button { showMenu = true } label: {
                         Image(systemName: "line.3.horizontal")
-                            .accessibilityLabel("Menu")
                     }
+                    .accessibilityLabel("Menu")
                 }
             }
         }
-
-        // MARK: - MENU
-        .sheet(isPresented: $showMenu) {
-            MenuView()
-        }
-
-        // MARK: - SAFETY INFO
-        .sheet(isPresented: $showSafetyInfo) {
-            InfoDetailView(
-                title: "Safety Information",
-                message: "This app provides a visual inspection only and does not replace professional battery testing or safety procedures."
-            )
-        }
-
-        // MARK: - CAMERA PERMISSION RESULT
         .onChange(of: cameraManager.permissionGranted) { _, granted in
             if granted { showCamera = true }
         }
-
-        // MARK: - PHOTO PERMISSION RESULT
         .onChange(of: photoPermissionManager.permissionGranted) { _, granted in
             if granted { showUIKitPicker = true }
         }
-
-        // MARK: - CAMERA SHEET
         .sheet(isPresented: $showCamera) {
             CameraView { image in
                 capturedImage = image
@@ -130,46 +123,30 @@ struct HomeScreen: View {
                 runClassification()
             }
         }
-
-        // MARK: - PHOTO PICKER SHEET
         .sheet(isPresented: $showUIKitPicker) {
             ImagePicker { image in
                 capturedImage = image
                 runClassification()
             }
         }
-
-        // MARK: - LOADING & RESULT
         .fullScreenCover(isPresented: $showLoading) {
             AnalysisLoadingScreen()
         }
         .fullScreenCover(isPresented: $showResult) {
             DetectionResultScreen(result: prediction ?? "Unknown")
         }
+    }
 
-        // MARK: - CAMERA DENIED ALERT
-        .alert("Camera Access Required", isPresented: $cameraManager.showPermissionAlert) {
-            Button("Open Settings") {
-                if let url = URL(string: UIApplication.openSettingsURLString) {
-                    UIApplication.shared.open(url)
-                }
-            }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("We use the camera to inspect the battery for visible bulging.")
-        }
+    // MARK: - VoiceOver (sync with tip; only once ever)
+    private func announceSpeechTipOnceIfNeeded() {
+        guard UIAccessibility.isVoiceOverRunning else { return }
+        guard !didAnnounceSpeechTip else { return }
 
-        // MARK: - PHOTO DENIED ALERT
-        .alert("Photo Access Required", isPresented: $photoPermissionManager.showDeniedAlert) {
-            Button("Open Settings") {
-                if let url = URL(string: UIApplication.openSettingsURLString) {
-                    UIApplication.shared.open(url)
-                }
-            }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("Please allow photo access to import battery images for analysis.")
-        }
+        UIAccessibility.post(
+            notification: .announcement,
+            argument: "Tip: You can enable speech feedback in Settings for spoken battery results."
+        )
+        didAnnounceSpeechTip = true
     }
 
     // MARK: - Classification
@@ -177,10 +154,8 @@ struct HomeScreen: View {
         guard let image = capturedImage else { return }
 
         showLoading = true
-
         DispatchQueue.global(qos: .userInitiated).async {
             let result = classifier.classify(image)
-
             DispatchQueue.main.async {
                 showLoading = false
                 prediction = result ?? "Unable to analyze image"

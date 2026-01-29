@@ -30,9 +30,9 @@ struct OnboardingContainerView: View {
                     title: "How It Works",
                     subtitle: "",
                     features: [
-                        "📷 Take a photo of the battery",
-                        "🔍 We analyze its condition",
-                        "🗂 Save images and view past results"
+                        "Take a photo of the battery",
+                        "We analyze its condition",
+                        "Save images and view past results"
                     ]
                 )
                 .tag(1)
