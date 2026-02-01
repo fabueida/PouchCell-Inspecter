@@ -1,6 +1,6 @@
 //
-//  Homescreen.swift
-//  PouchCellInspecter
+//  HomeScreen.swift
+//  PouchCellInspector
 //
 //  Created by Firas Abueida on 11/26/25.
 //
@@ -30,30 +30,11 @@ struct HomeScreen: View {
     private let classifier = ImageClassifier()
 
     var body: some View {
-        Group {
-            if #available(iOS 17.0, *), hasSeenOnboarding {
-                mainContent
-                    .popoverTip(SpeechFeedbackTip())
-                    .onAppear { announceSpeechTipOnceIfNeeded() }
-            } else {
-                mainContent
-            }
-        }
-        .sheet(isPresented: $showMenu) { MenuView() }
-        .sheet(isPresented: $showSafetyInfo) {
-            InfoDetailView(
-                title: "Safety Information",
-                message: "This app provides a visual inspection only and does not replace professional battery testing."
-            )
-        }
-    }
-
-    // MARK: - UI
-    private var mainContent: some View {
         NavigationStack {
             ZStack {
                 AppTheme.background
                     .ignoresSafeArea()
+                    .allowsHitTesting(false)
 
                 VStack(spacing: 36) {
 
@@ -62,8 +43,11 @@ struct HomeScreen: View {
 
                     Spacer()
 
-                    Button {
-                        cameraManager.requestPermission()
+                                        Button {
+                        Task {
+                            let granted = await cameraManager.requestPermissionAsync()
+                            if granted { showCamera = true }
+                        }
                     } label: {
                         Label("Scan", systemImage: "camera.fill")
                             .font(.system(size: 20, weight: .semibold))
@@ -72,11 +56,16 @@ struct HomeScreen: View {
                             .padding(.vertical, 20)
                             .background(AppTheme.accent)
                             .cornerRadius(18)
+                            .accessibilityHint("Double tap to open the camera and take a picture of a lithium battery.")
                     }
                     .padding(.horizontal, 32)
+                    .popoverTip(SpeechFeedbackTip())
 
-                    Button {
-                        photoPermissionManager.requestPermission()
+                                        Button {
+                        Task {
+                            let granted = await photoPermissionManager.requestPermissionAsync()
+                            if granted { showUIKitPicker = true }
+                        }
                     } label: {
                         Label("Import from Library", systemImage: "photo.on.rectangle")
                             .font(.system(size: 17, weight: .medium))
@@ -86,11 +75,12 @@ struct HomeScreen: View {
                             .background(
                                 RoundedRectangle(cornerRadius: 16)
                                     .stroke(AppTheme.accent, lineWidth: 2)
+                                    .accessibilityHint("Choose an image of a lithium battery and get a result")
                             )
                     }
                     .padding(.horizontal, 64)
 
-                    Button {
+                                        Button {
                         showSafetyInfo = true
                     } label: {
                         Label("Safety Info", systemImage: "info.circle")
@@ -100,60 +90,80 @@ struct HomeScreen: View {
                     Spacer()
                 }
             }
-            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button { showMenu = true } label: {
                         Image(systemName: "line.3.horizontal")
+                            .accessibilityLabel("Menu")
                     }
-                    .accessibilityLabel("Menu")
                 }
             }
         }
-        .onChange(of: cameraManager.permissionGranted) { _, granted in
-            if granted { showCamera = true }
+        .task { try? Tips.configure() }
+
+        .sheet(isPresented: $showMenu) {
+            MenuView()
         }
-        .onChange(of: photoPermissionManager.permissionGranted) { _, granted in
-            if granted { showUIKitPicker = true }
+
+        // ✅ Safety Info sheet now has a close button
+        .sheet(isPresented: $showSafetyInfo) {
+            NavigationStack {
+                InfoDetailView(
+                    title: "Safety Information",
+                    message: "This app provides a visual inspection only and does not replace professional battery testing."
+                )
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button {
+                            showSafetyInfo = false
+                        } label: {
+                            Image(systemName: "xmark")
+                        }
+                        .accessibilityLabel("Close")
+                    }
+                }
+            }
         }
+
         .sheet(isPresented: $showCamera) {
             CameraView { image in
                 capturedImage = image
-                showCamera = false
                 runClassification()
             }
         }
+
         .sheet(isPresented: $showUIKitPicker) {
             ImagePicker { image in
                 capturedImage = image
                 runClassification()
             }
         }
+
         .fullScreenCover(isPresented: $showLoading) {
             AnalysisLoadingScreen()
         }
-        .fullScreenCover(isPresented: $showResult) {
-            DetectionResultScreen(result: prediction ?? "Unknown")
+
+        // Result is presented as a dismissible sheet so users can close and return to main page.
+        .sheet(isPresented: $showResult) {
+            DetectionResultScreen(
+                result: prediction ?? "Unknown",
+                onScanAgain: {
+                    Task {
+                        let granted = await cameraManager.requestPermissionAsync()
+                        if granted { showCamera = true }
+                    }
+                }
+            )
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
         }
     }
 
-    // MARK: - VoiceOver (sync with tip; only once ever)
-    private func announceSpeechTipOnceIfNeeded() {
-        guard UIAccessibility.isVoiceOverRunning else { return }
-        guard !didAnnounceSpeechTip else { return }
-
-        UIAccessibility.post(
-            notification: .announcement,
-            argument: "Tip: You can enable speech feedback in Settings for spoken battery results."
-        )
-        didAnnounceSpeechTip = true
-    }
-
-    // MARK: - Classification
     private func runClassification() {
         guard let image = capturedImage else { return }
-
         showLoading = true
+
         DispatchQueue.global(qos: .userInitiated).async {
             let result = classifier.classify(image)
             DispatchQueue.main.async {
@@ -164,3 +174,4 @@ struct HomeScreen: View {
         }
     }
 }
+
