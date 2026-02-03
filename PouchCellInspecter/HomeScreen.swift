@@ -56,7 +56,7 @@ struct HomeScreen: View {
                             .padding(.vertical, 20)
                             .background(AppTheme.accent)
                             .cornerRadius(18)
-                            .accessibilityHint("Double tap to open the camera and take a picture of a lithium battery.")
+                            .accessibilityHint("Double tap to open the camera and take a picture of a lithium pouch cell battery.")
                     }
                     .padding(.horizontal, 32)
                     .popoverTip(SpeechFeedbackTip())
@@ -75,7 +75,7 @@ struct HomeScreen: View {
                             .background(
                                 RoundedRectangle(cornerRadius: 16)
                                     .stroke(AppTheme.accent, lineWidth: 2)
-                                    .accessibilityHint("Choose an image of a lithium battery and get a result")
+                                    .accessibilityHint("Choose an image of a lithium pouch cell battery that you've saved and get a result.")
                             )
                     }
                     .padding(.horizontal, 64)

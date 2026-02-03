@@ -124,7 +124,6 @@ struct SafetyTipContent {
     }
 }
 
-// MARK: - UI
 
 struct DetectionResultScreen: View {
     let result: String
@@ -144,8 +143,7 @@ struct DetectionResultScreen: View {
 
                 VStack(spacing: 24) {
 
-                    // Camera card
-                    RoundedRectangle(cornerRadius: 20)
+                                        RoundedRectangle(cornerRadius: 20)
                         .fill(Color(red: 0.73, green: 0.81, blue: 0.86))
                         .frame(height: 180)
                         .overlay(
@@ -181,8 +179,7 @@ struct DetectionResultScreen: View {
                     // Buttons
                     VStack(spacing: 20) {
                         Button {
-                            // Dismiss the result sheet, then start a new scan from the parent.
-                            dismiss()
+                                                        dismiss()
                             DispatchQueue.main.async {
                                 onScanAgain()
                             }
@@ -292,4 +289,5 @@ struct DetectionResultScreen_Previews: PreviewProvider {
         DetectionResultScreen(result: "Normal", onScanAgain: {})
     }
 }
+
 
