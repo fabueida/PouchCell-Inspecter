@@ -10,6 +10,13 @@ import Photos
 import UIKit
 import TipKit
 
+// ✅ NEW: bundle result + scanned image together so result screen always has the correct image
+private struct DetectionResultPayload: Identifiable {
+    let id = UUID()
+    let result: String
+    let image: UIImage
+}
+
 struct HomeScreen: View {
 
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
@@ -22,10 +29,12 @@ struct HomeScreen: View {
     @State private var showSafetyInfo = false
     @State private var showCamera = false
     @State private var showUIKitPicker = false
+
     @State private var capturedImage: UIImage?
-    @State private var prediction: String?
     @State private var showLoading = false
-    @State private var showResult = false
+
+    // ✅ NEW: present results via an item that contains BOTH image + result
+    @State private var resultPayload: DetectionResultPayload?
 
     private let classifier = ImageClassifier()
 
@@ -43,7 +52,7 @@ struct HomeScreen: View {
 
                     Spacer()
 
-                                        Button {
+                    Button {
                         Task {
                             let granted = await cameraManager.requestPermissionAsync()
                             if granted { showCamera = true }
@@ -61,7 +70,7 @@ struct HomeScreen: View {
                     .padding(.horizontal, 32)
                     .popoverTip(SpeechFeedbackTip())
 
-                                        Button {
+                    Button {
                         Task {
                             let granted = await photoPermissionManager.requestPermissionAsync()
                             if granted { showUIKitPicker = true }
@@ -80,7 +89,7 @@ struct HomeScreen: View {
                     }
                     .padding(.horizontal, 64)
 
-                                        Button {
+                    Button {
                         showSafetyInfo = true
                     } label: {
                         Label("Safety Info", systemImage: "info.circle")
@@ -105,7 +114,6 @@ struct HomeScreen: View {
             MenuView()
         }
 
-        // ✅ Safety Info sheet now has a close button
         .sheet(isPresented: $showSafetyInfo) {
             NavigationStack {
                 InfoDetailView(
@@ -144,10 +152,11 @@ struct HomeScreen: View {
             AnalysisLoadingScreen()
         }
 
-        // Result is presented as a dismissible sheet so users can close and return to main page.
-        .sheet(isPresented: $showResult) {
+        // ✅ NEW: result screen is driven by payload (image + result)
+        .sheet(item: $resultPayload) { payload in
             DetectionResultScreen(
-                result: prediction ?? "Unknown",
+                result: payload.result,
+                scannedImage: payload.image,
                 onScanAgain: {
                     Task {
                         let granted = await cameraManager.requestPermissionAsync()
@@ -165,11 +174,13 @@ struct HomeScreen: View {
         showLoading = true
 
         DispatchQueue.global(qos: .userInitiated).async {
-            let result = classifier.classify(image)
+            let result = classifier.classify(image) ?? "Unable to analyze image"
+
             DispatchQueue.main.async {
                 showLoading = false
-                prediction = result ?? "Unable to analyze image"
-                showResult = true
+
+                // ✅ NEW: set payload (guarantees result screen has the correct image)
+                self.resultPayload = DetectionResultPayload(result: result, image: image)
             }
         }
     }

@@ -58,13 +58,6 @@
 			);
 			target = 888AF1342ED64B9500EB16CC /* PouchCellInspecter */;
 		};
-		DC4606762EF008C1005EB67B /* Exceptions for "PouchCellInspecterTests" folder in "PouchCellInspecter" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				test_image.jpg,
-			);
-			target = 888AF1342ED64B9500EB16CC /* PouchCellInspecter */;
-		};
 		DCB71C8C2EF0DE5B00AFE0AD /* Exceptions for "PouchCellInspecter" folder in "PouchCellInspecterTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -86,9 +79,6 @@
 		};
 		DC46066E2EF00788005EB67B /* PouchCellInspecterTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				DC4606762EF008C1005EB67B /* Exceptions for "PouchCellInspecterTests" folder in "PouchCellInspecter" target */,
-			);
 			path = PouchCellInspecterTests;
 			sourceTree = "<group>";
 		};

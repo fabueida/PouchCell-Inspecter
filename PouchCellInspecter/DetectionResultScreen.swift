@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 // MARK: - Domain
 
@@ -124,15 +125,24 @@ struct SafetyTipContent {
     }
 }
 
-
 struct DetectionResultScreen: View {
     let result: String
+
+    // ✅ NEW: scanned/imported image
+    let scannedImage: UIImage?
+
     let onScanAgain: () -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var showSafetyTips = false
 
     private var condition: BatteryCondition { BatteryCondition(from: result) }
+
+    init(result: String, scannedImage: UIImage? = nil, onScanAgain: @escaping () -> Void) {
+        self.result = result
+        self.scannedImage = scannedImage
+        self.onScanAgain = onScanAgain
+    }
 
     var body: some View {
         NavigationStack {
@@ -143,18 +153,30 @@ struct DetectionResultScreen: View {
 
                 VStack(spacing: 24) {
 
-                                        RoundedRectangle(cornerRadius: 20)
-                        .fill(Color(red: 0.73, green: 0.81, blue: 0.86))
-                        .frame(height: 180)
-                        .overlay(
-                            Image(systemName: "camera")
+                    // ✅ UPDATED: show image if available, otherwise show existing placeholder
+                    Group {
+                        if let uiImage = scannedImage {
+                            Image(uiImage: uiImage)
                                 .resizable()
-                                .scaledToFit()
-                                .padding(40)
-                                .foregroundColor(.black)
-                        )
-                        .padding(.horizontal, 32)
-                        .padding(.top, 6)
+                                .scaledToFill()
+                                .frame(height: 180)
+                                .clipped()
+                                .cornerRadius(20)
+                        } else {
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(Color(red: 0.73, green: 0.81, blue: 0.86))
+                                .frame(height: 180)
+                                .overlay(
+                                    Image(systemName: "camera")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .padding(40)
+                                        .foregroundColor(.black)
+                                )
+                        }
+                    }
+                    .padding(.horizontal, 32)
+                    .padding(.top, 6)
 
                     // Result text
                     Text("Battery is \(condition.displayName)")
@@ -179,7 +201,7 @@ struct DetectionResultScreen: View {
                     // Buttons
                     VStack(spacing: 20) {
                         Button {
-                                                        dismiss()
+                            dismiss()
                             DispatchQueue.main.async {
                                 onScanAgain()
                             }
@@ -286,8 +308,6 @@ struct SafetyTipsSheet: View {
 
 struct DetectionResultScreen_Previews: PreviewProvider {
     static var previews: some View {
-        DetectionResultScreen(result: "Normal", onScanAgain: {})
+        DetectionResultScreen(result: "Normal", scannedImage: nil, onScanAgain: {})
     }
 }
-
-
