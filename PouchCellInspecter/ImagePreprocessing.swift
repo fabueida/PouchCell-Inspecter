@@ -6,6 +6,7 @@
 //
 import UIKit
 import CoreGraphics
+import CoreML
 
 enum ImagePreprocessing {
     static func imageToGrayscaleVector (_ image: UIImage, size: Int = 128) -> [Double]? {
@@ -39,4 +40,21 @@ enum ImagePreprocessing {
         
         return rawData.map { Double($0) / 255.0 }
     }
+    // Convert [Double] vector to MLMultiArray
+       static func vectorToMultiArray(_ v: [Double]) -> MLMultiArray? {
+           guard v.count == 128 * 128 else { return nil }
+           guard let arr = try? MLMultiArray(shape: [NSNumber(value: v.count)], dataType: .double) else { return nil }
+
+           // Fast fill using pointer
+           let ptr = arr.dataPointer.bindMemory(to: Double.self, capacity: v.count)
+           for i in 0..<v.count { ptr[i] = v[i] }
+
+           return arr
+       }
+
+       // Convenience: UIImage -> MLMultiArray directly
+       static func imageToGrayscaleMultiArray(_ image: UIImage, size: Int = 128) -> MLMultiArray? {
+           guard let v = imageToGrayscaleVector(image, size: size) else { return nil }
+           return vectorToMultiArray(v)
+       }
 }

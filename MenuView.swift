@@ -81,7 +81,7 @@ struct MenuView: View {
 
                                 Section("Accessibility") {
                                         Toggle(
-                        "Speak results aloud",
+                        "Speak results after scan",
                         isOn: Binding(
                             get: { speechSettings.isEnabled },
                             set: { newValue in

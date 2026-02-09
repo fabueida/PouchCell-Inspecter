@@ -10,7 +10,6 @@ import Photos
 import UIKit
 import TipKit
 
-// ✅ NEW: bundle result + scanned image together so result screen always has the correct image
 private struct DetectionResultPayload: Identifiable {
     let id = UUID()
     let result: String
@@ -33,10 +32,10 @@ struct HomeScreen: View {
     @State private var capturedImage: UIImage?
     @State private var showLoading = false
 
-    // ✅ NEW: present results via an item that contains BOTH image + result
     @State private var resultPayload: DetectionResultPayload?
 
-    private let classifier = ImageClassifier()
+    // ✅ FIX: Correct classifier type name
+    private let classifier = DTImageClassifier()
 
     var body: some View {
         NavigationStack {
@@ -152,7 +151,6 @@ struct HomeScreen: View {
             AnalysisLoadingScreen()
         }
 
-        // ✅ NEW: result screen is driven by payload (image + result)
         .sheet(item: $resultPayload) { payload in
             DetectionResultScreen(
                 result: payload.result,
@@ -174,13 +172,21 @@ struct HomeScreen: View {
         showLoading = true
 
         DispatchQueue.global(qos: .userInitiated).async {
-            let result = classifier.classify(image) ?? "Unable to analyze image"
+            let result = try? classifier.classify(image)
 
             DispatchQueue.main.async {
                 showLoading = false
 
-                // ✅ NEW: set payload (guarantees result screen has the correct image)
-                self.resultPayload = DetectionResultPayload(result: result, image: image)
+                let resultString: String
+                if let result = result {
+                    let label = result.classLabel
+                    let confidence = result.topK.first?.prob ?? 0.0
+                    resultString = "\(label) - \(String(format: "%.2f", confidence * 100))"
+                } else {
+                    resultString = "Unable to analyze image"
+                }
+
+                self.resultPayload = DetectionResultPayload(result: resultString, image: image)
             }
         }
     }
