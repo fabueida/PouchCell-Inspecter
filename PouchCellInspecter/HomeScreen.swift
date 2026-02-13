@@ -34,7 +34,8 @@ struct HomeScreen: View {
     @State private var resultPayload: DetectionResultPayload?
 
     // ✅ FIX: Correct classifier type name
-    private let classifier = DTImageClassifier()
+//    private let classifier = DTImageClassifier()
+    private let classifier = RFImageClassifier()
 
     var body: some View {
         NavigationStack {

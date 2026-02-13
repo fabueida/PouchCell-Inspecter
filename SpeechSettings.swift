@@ -14,10 +14,15 @@ struct SpeechSettings: Codable {
     var voiceIdentifier: String?
 
     var voice: AVSpeechSynthesisVoice? {
-        if let id = voiceIdentifier {
-            return AVSpeechSynthesisVoice(identifier: id)
+        if let id = voiceIdentifier, let v = AVSpeechSynthesisVoice(identifier: id) {
+            return v
         }
-        return AVSpeechSynthesisVoice(language: Locale.current.identifier)
+
+        // Prefer the user’s current language if available; otherwise fall back to English.
+        let localeId = Locale.current.identifier
+        return AVSpeechSynthesisVoice(language: localeId)
+            ?? AVSpeechSynthesisVoice(language: Locale.current.language.languageCode?.identifier ?? "en-US")
+            ?? AVSpeechSynthesisVoice(language: "en-US")
     }
 
     static let `default` = SpeechSettings(

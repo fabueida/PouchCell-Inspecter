@@ -16,6 +16,7 @@
 		8846F77F2F2407F00011F803 /* SpeechSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8846F77E2F2407F00011F803 /* SpeechSettings.swift */; };
 		884F09042F3ED44E00EEA2A4 /* SpeechSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884F09032F3ED44E00EEA2A4 /* SpeechSettingsStore.swift */; };
 		888364702F200CAA00CB5773 /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8883646F2F200CAA00CB5773 /* MenuView.swift */; };
+		88865E4F2F3C2E9A00616C0C /* SpeechSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88865E4E2F3C2E9A00616C0C /* SpeechSettingsStore.swift */; };
 		88ACF8872F2AB78400C00B33 /* OnboardingContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88ACF8862F2AB78400C00B33 /* OnboardingContainerView.swift */; };
 		88ACF8892F2AB95F00C00B33 /* OnboardingPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88ACF8882F2AB95F00C00B33 /* OnboardingPageView.swift */; };
 		88B6C9892F2964A300AEC090 /* PhotoPermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B6C9882F2964A300AEC090 /* PhotoPermissionManager.swift */; };
@@ -44,6 +45,7 @@
 		8846F77E2F2407F00011F803 /* SpeechSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSettings.swift; sourceTree = "<group>"; };
 		884F09032F3ED44E00EEA2A4 /* SpeechSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSettingsStore.swift; sourceTree = "<group>"; };
 		8883646F2F200CAA00CB5773 /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
+		88865E4E2F3C2E9A00616C0C /* SpeechSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSettingsStore.swift; sourceTree = "<group>"; };
 		888AF1352ED64B9500EB16CC /* PouchCellInspecter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PouchCellInspecter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		88ACF8862F2AB78400C00B33 /* OnboardingContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingContainerView.swift; sourceTree = "<group>"; };
 		88ACF8882F2AB95F00C00B33 /* OnboardingPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPageView.swift; sourceTree = "<group>"; };
@@ -117,6 +119,7 @@
 				8846F77C2F2407BA0011F803 /* SpeechManager.swift */,
 				884F09032F3ED44E00EEA2A4 /* SpeechSettingsStore.swift */,
 				8846F77E2F2407F00011F803 /* SpeechSettings.swift */,
+				88865E4E2F3C2E9A00616C0C /* SpeechSettingsStore.swift */,
 				DC3487512EF1F5750006D3AE /* AllViews.swift */,
 				88ACF8862F2AB78400C00B33 /* OnboardingContainerView.swift */,
 				88ACF8882F2AB95F00C00B33 /* OnboardingPageView.swift */,
@@ -263,6 +266,7 @@
 				88B6C9892F2964A300AEC090 /* PhotoPermissionManager.swift in Sources */,
 				88ACF8872F2AB78400C00B33 /* OnboardingContainerView.swift in Sources */,
 				8806F3B92EE0B0B50082B105 /* CameraView.swift in Sources */,
+				88865E4F2F3C2E9A00616C0C /* SpeechSettingsStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -411,12 +415,20 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+<<<<<<< HEAD
 				CURRENT_PROJECT_VERSION = 11;
+=======
+				CURRENT_PROJECT_VERSION = 5;
+>>>>>>> 6c08400 (Implemented new ML model)
 				DEVELOPMENT_TEAM = 748PM6VCVK;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PouchCellInspecter/Info.plist;
+<<<<<<< HEAD
 				INFOPLIST_KEY_CFBundleDisplayName = "Pouch Cell Inspector";
+=======
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+>>>>>>> 6c08400 (Implemented new ML model)
 				INFOPLIST_KEY_NSCameraUsageDescription = "“We use the camera to take a picture of your battery to determine if your battery is bulging.”";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This allows the app to analyze lithium-ion pouch batteries and provide safety-related information.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -448,12 +460,20 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+<<<<<<< HEAD
 				CURRENT_PROJECT_VERSION = 11;
+=======
+				CURRENT_PROJECT_VERSION = 5;
+>>>>>>> 6c08400 (Implemented new ML model)
 				DEVELOPMENT_TEAM = 748PM6VCVK;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PouchCellInspecter/Info.plist;
+<<<<<<< HEAD
 				INFOPLIST_KEY_CFBundleDisplayName = "Pouch Cell Inspector";
+=======
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+>>>>>>> 6c08400 (Implemented new ML model)
 				INFOPLIST_KEY_NSCameraUsageDescription = "“We use the camera to take a picture of your battery to determine if your battery is bulging.”";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This allows the app to analyze lithium-ion pouch batteries and provide safety-related information.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
