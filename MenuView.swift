@@ -36,20 +36,10 @@ struct MenuView: View {
 
     @Environment(\.dismiss) private var dismiss
 
-<<<<<<< HEAD
     // Shared speech settings used by the whole app
     @EnvironmentObject private var speechStore: SpeechSettingsStore
 
     @AppStorage("appAppearance") private var appearance: AppAppearance = .system
-=======
-    @AppStorage("appAppearance") private var appearance: AppAppearance = .system
-    @AppStorage(SpeechSettingsStorage.key) private var speechSettingsData: Data = SpeechSettingsStorage.encode(.default)
-
-    private var speechSettings: SpeechSettings {
-        get { SpeechSettingsStorage.decode(speechSettingsData) }
-        nonmutating set { speechSettingsData = SpeechSettingsStorage.encode(newValue) }
-    }
->>>>>>> 6c08400 (Implemented new ML model)
 
     private var availableVoices: [AVSpeechSynthesisVoice] {
         AVSpeechSynthesisVoice.speechVoices().sorted { (lhs, rhs) in
@@ -72,19 +62,11 @@ struct MenuView: View {
 
                 Section("Accessibility") {
                     Toggle("Speak results after scan", isOn: Binding(
-<<<<<<< HEAD
                         get: { speechStore.settings.isEnabled },
                         set: { newValue in
                             var s = speechStore.settings
                             s.isEnabled = newValue
                             speechStore.settings = s
-=======
-                        get: { speechSettings.isEnabled },
-                        set: { newValue in
-                            var s = speechSettings
-                            s.isEnabled = newValue
-                            speechSettings = s
->>>>>>> 6c08400 (Implemented new ML model)
 
                             if !newValue {
                                 SpeechManager.shared.stop()
@@ -94,11 +76,7 @@ struct MenuView: View {
 
                     Text("The app can automatically read out the scan result after analysis.")
 
-<<<<<<< HEAD
                     if speechStore.settings.isEnabled {
-=======
-                    if speechSettings.isEnabled {
->>>>>>> 6c08400 (Implemented new ML model)
                         VStack(alignment: .leading, spacing: 12) {
 
                             VStack(alignment: .leading, spacing: 6) {
@@ -112,11 +90,7 @@ struct MenuView: View {
                                         set: { newValue in
                                             var s = speechStore.settings
                                             s.rate = newValue
-<<<<<<< HEAD
                                             speechStore.settings = s
-=======
-                                            speechSettings = s
->>>>>>> 6c08400 (Implemented new ML model)
                                         }
                                     ),
                                     in: AVSpeechUtteranceMinimumSpeechRate...AVSpeechUtteranceMaximumSpeechRate
@@ -134,11 +108,7 @@ struct MenuView: View {
                                         set: { newValue in
                                             var s = speechStore.settings
                                             s.pitch = newValue
-<<<<<<< HEAD
                                             speechStore.settings = s
-=======
-                                            speechSettings = s
->>>>>>> 6c08400 (Implemented new ML model)
                                         }
                                     ),
                                     in: 0.5...2.0
@@ -151,19 +121,11 @@ struct MenuView: View {
                                     .foregroundStyle(.secondary)
 
                                 Picker("Voice", selection: Binding(
-<<<<<<< HEAD
                                     get: { speechStore.settings.voiceIdentifier ?? "" },
                                     set: { newValue in
                                         var s = speechStore.settings
                                         s.voiceIdentifier = newValue.isEmpty ? nil : newValue
                                         speechStore.settings = s
-=======
-                                    get: { speechSettings.voiceIdentifier ?? "" },
-                                    set: { newValue in
-                                        var s = speechSettings
-                                        s.voiceIdentifier = newValue.isEmpty ? nil : newValue
-                                        speechSettings = s
->>>>>>> 6c08400 (Implemented new ML model)
                                     }
                                 )) {
                                     Text("System default").tag("")
@@ -177,11 +139,7 @@ struct MenuView: View {
 
                             Button {
                                 let sample = "Scan result reading is enabled."
-<<<<<<< HEAD
                                 SpeechManager.shared.speak(sample, settings: speechStore.settings)
-=======
-                                speakWithAudioSession(sample, settings: speechSettings)
->>>>>>> 6c08400 (Implemented new ML model)
                             } label: {
                                 Label("Test speech", systemImage: "speaker.wave.2.fill")
                             }
