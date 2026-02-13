@@ -44,6 +44,18 @@ enum BatteryCondition: Equatable {
             return "The image couldn’t be confidently classified. Try again with better lighting and focus."
         }
     }
+
+    /// Phrase used for text-to-speech on the confirmation page.
+    var speechPhrase: String {
+        switch self {
+        case .normal:
+            return "Battery is normal."
+        case .bulging:
+            return "Battery is bulging."
+        case .unknown:
+            return "Battery condition is unknown."
+        }
+    }
 }
 
 struct SafetyTipContent {
@@ -135,6 +147,10 @@ struct DetectionResultScreen: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var showSafetyTips = false
+
+    // Shared speech settings
+    @EnvironmentObject private var speechStore: SpeechSettingsStore
+    @State private var didSpeakResult = false
 
     private var condition: BatteryCondition { BatteryCondition(from: result) }
 
@@ -235,6 +251,22 @@ struct DetectionResultScreen: View {
             }
             .navigationTitle("Result")
             .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                // Speak once when the confirmation/result sheet appears.
+                guard !didSpeakResult else { return }
+                didSpeakResult = true
+
+                let phrase = condition.speechPhrase
+
+                // A tiny delay makes speech more reliable when presented as a sheet.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                    SpeechManager.shared.speak(phrase, settings: speechStore.settings)
+                }
+            }
+            .onDisappear {
+                // Avoid lingering speech if the user dismisses quickly.
+                SpeechManager.shared.stop()
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button {
@@ -309,5 +341,7 @@ struct SafetyTipsSheet: View {
 struct DetectionResultScreen_Previews: PreviewProvider {
     static var previews: some View {
         DetectionResultScreen(result: "Normal", scannedImage: nil, onScanAgain: {})
+            .environmentObject(SpeechSettingsStore.shared)
     }
 }
+

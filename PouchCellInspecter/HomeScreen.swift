@@ -25,7 +25,6 @@ struct HomeScreen: View {
     @StateObject private var photoPermissionManager = PhotoPermissionManager()
 
     @State private var showMenu = false
-    @State private var showSafetyInfo = false
     @State private var showCamera = false
     @State private var showUIKitPicker = false
 
@@ -88,8 +87,9 @@ struct HomeScreen: View {
                     }
                     .padding(.horizontal, 64)
 
-                    Button {
-                        showSafetyInfo = true
+                    // ✅ Polished: Safety Info as a NavigationLink (instead of a sheet)
+                    NavigationLink {
+                        SafetyInfoView()
                     } label: {
                         Label("Safety Info", systemImage: "info.circle")
                             .foregroundColor(.secondary)
@@ -111,26 +111,6 @@ struct HomeScreen: View {
 
         .sheet(isPresented: $showMenu) {
             MenuView()
-        }
-
-        .sheet(isPresented: $showSafetyInfo) {
-            NavigationStack {
-                InfoDetailView(
-                    title: "Safety Information",
-                    message: "This app provides a visual inspection only and does not replace professional battery testing."
-                )
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .topBarLeading) {
-                        Button {
-                            showSafetyInfo = false
-                        } label: {
-                            Image(systemName: "xmark")
-                        }
-                        .accessibilityLabel("Close")
-                    }
-                }
-            }
         }
 
         .sheet(isPresented: $showCamera) {
