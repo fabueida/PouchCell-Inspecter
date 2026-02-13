@@ -32,45 +32,26 @@ enum AppAppearance: String, CaseIterable, Identifiable {
     }
 }
 
-private enum SpeechSettingsStorage {
-    static let key = "speechSettingsData"
-
-    static func encode(_ settings: SpeechSettings) -> Data {
-        (try? JSONEncoder().encode(settings)) ?? Data()
-    }
-
-    static func decode(_ data: Data) -> SpeechSettings {
-        (try? JSONDecoder().decode(SpeechSettings.self, from: data)) ?? .default
-    }
-}
-
 struct MenuView: View {
 
     @Environment(\.dismiss) private var dismiss
 
-        @AppStorage("appAppearance") private var appearance: AppAppearance = .system
+    // Shared speech settings used by the whole app
+    @EnvironmentObject private var speechStore: SpeechSettingsStore
 
-        @AppStorage(SpeechSettingsStorage.key) private var speechSettingsData: Data = SpeechSettingsStorage.encode(.default)
-
-    @State private var isTestingSpeech = false
-
-    private var speechSettings: SpeechSettings {
-        get { SpeechSettingsStorage.decode(speechSettingsData) }
-        nonmutating set { speechSettingsData = SpeechSettingsStorage.encode(newValue) }
-    }
+    @AppStorage("appAppearance") private var appearance: AppAppearance = .system
 
     private var availableVoices: [AVSpeechSynthesisVoice] {
-        AVSpeechSynthesisVoice.speechVoices()
-            .sorted { lhs, rhs in
-                                (lhs.language, lhs.name) < (rhs.language, rhs.name)
-            }
+        AVSpeechSynthesisVoice.speechVoices().sorted { (lhs, rhs) in
+            (lhs.language, lhs.name) < (rhs.language, rhs.name)
+        }
     }
 
     var body: some View {
         NavigationStack {
             List {
 
-                                Section("Safety") {
+                Section("Safety") {
                     NavigationLink("Battery inspection disclaimer") {
                         InfoDetailView(
                             title: "Safety Disclaimer",
@@ -79,78 +60,74 @@ struct MenuView: View {
                     }
                 }
 
-                                Section("Accessibility") {
-                                        Toggle(
-                        "Speak results after scan",
-                        isOn: Binding(
-                            get: { speechSettings.isEnabled },
-                            set: { newValue in
-                                var s = speechSettings
-                                s.isEnabled = newValue
-                                speechSettingsData = SpeechSettingsStorage.encode(s)
+                Section("Accessibility") {
+                    Toggle("Speak results after scan", isOn: Binding(
+                        get: { speechStore.settings.isEnabled },
+                        set: { newValue in
+                            var s = speechStore.settings
+                            s.isEnabled = newValue
+                            speechStore.settings = s
 
-                                if !newValue {
-                                                                        SpeechManager.shared.stop()
-                                }
+                            if !newValue {
+                                SpeechManager.shared.stop()
                             }
-                        )
-                    )
+                        }
+                    ))
+
                     Text("The app can automatically read out the scan result after analysis.")
-                                        if speechSettings.isEnabled {
+
+                    if speechStore.settings.isEnabled {
                         VStack(alignment: .leading, spacing: 12) {
 
-                                                        VStack(alignment: .leading, spacing: 6) {
+                            VStack(alignment: .leading, spacing: 6) {
                                 Text("Speech rate")
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
 
                                 Slider(
                                     value: Binding(
-                                        get: { speechSettings.rate },
+                                        get: { speechStore.settings.rate },
                                         set: { newValue in
-                                            var s = speechSettings
+                                            var s = speechStore.settings
                                             s.rate = newValue
-                                            speechSettingsData = SpeechSettingsStorage.encode(s)
+                                            speechStore.settings = s
                                         }
                                     ),
                                     in: AVSpeechUtteranceMinimumSpeechRate...AVSpeechUtteranceMaximumSpeechRate
                                 )
                             }
 
-                                                        VStack(alignment: .leading, spacing: 6) {
+                            VStack(alignment: .leading, spacing: 6) {
                                 Text("Pitch")
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
 
                                 Slider(
                                     value: Binding(
-                                        get: { speechSettings.pitch },
+                                        get: { speechStore.settings.pitch },
                                         set: { newValue in
-                                            var s = speechSettings
+                                            var s = speechStore.settings
                                             s.pitch = newValue
-                                            speechSettingsData = SpeechSettingsStorage.encode(s)
+                                            speechStore.settings = s
                                         }
                                     ),
                                     in: 0.5...2.0
                                 )
                             }
 
-                                                        VStack(alignment: .leading, spacing: 6) {
+                            VStack(alignment: .leading, spacing: 6) {
                                 Text("Voice")
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
 
-                                Picker(
-                                    "Voice",
-                                    selection: Binding(
-                                        get: { speechSettings.voiceIdentifier ?? "" },
-                                        set: { newValue in
-                                            var s = speechSettings
-                                            s.voiceIdentifier = newValue.isEmpty ? nil : newValue
-                                            speechSettingsData = SpeechSettingsStorage.encode(s)
-                                        }
-                                    )
-                                ) {
+                                Picker("Voice", selection: Binding(
+                                    get: { speechStore.settings.voiceIdentifier ?? "" },
+                                    set: { newValue in
+                                        var s = speechStore.settings
+                                        s.voiceIdentifier = newValue.isEmpty ? nil : newValue
+                                        speechStore.settings = s
+                                    }
+                                )) {
                                     Text("System default").tag("")
 
                                     ForEach(availableVoices, id: \.identifier) { voice in
@@ -161,8 +138,8 @@ struct MenuView: View {
                             }
 
                             Button {
-                                                                let sample = "Scan result reading is enabled."
-                                SpeechManager.shared.speak(sample, settings: speechSettings)
+                                let sample = "Scan result reading is enabled."
+                                SpeechManager.shared.speak(sample, settings: speechStore.settings)
                             } label: {
                                 Label("Test speech", systemImage: "speaker.wave.2.fill")
                             }
@@ -171,7 +148,7 @@ struct MenuView: View {
                     }
                 }
 
-                                Section("Appearance") {
+                Section("Appearance") {
                     Picker("App appearance", selection: $appearance) {
                         ForEach(AppAppearance.allCases) { option in
                             Text(option.title).tag(option)
@@ -179,10 +156,8 @@ struct MenuView: View {
                     }
                 }
 
-                                Section("About") {
-                    if let version = Bundle.main
-                        .infoDictionary?["CFBundleShortVersionString"] as? String {
-
+                Section("About") {
+                    if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
                         HStack {
                             Text("App Version")
                             Spacer()
@@ -190,8 +165,6 @@ struct MenuView: View {
                                 .foregroundColor(.secondary)
                         }
                     }
-
-                                        //LabeledContent("Model version", value: "v1")
 
                     NavigationLink("Contact & feedback") {
                         InfoDetailView(
@@ -233,5 +206,7 @@ struct InfoDetailView: View {
 
 #Preview {
     MenuView()
+        .environmentObject(SpeechSettingsStore.shared)
 }
+
 
