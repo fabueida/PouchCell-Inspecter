@@ -7,6 +7,8 @@
 
 import SwiftUI
 import AVFoundation
+import MessageUI
+import UIKit
 
 enum AppAppearance: String, CaseIterable, Identifiable {
     case system
@@ -41,6 +43,34 @@ struct MenuView: View {
 
     @AppStorage("appAppearance") private var appearance: AppAppearance = .system
 
+    // Common camera-style settings (wire these into your camera screen later if desired)
+    @AppStorage("pref_showGrid") private var showGrid: Bool = true
+    @AppStorage("pref_saveToPhotos") private var saveToPhotos: Bool = true
+
+    // ✅ Haptics are OFF by default on first install (opt-in).
+    @AppStorage("pref_haptics") private var haptics: Bool = false
+
+    // Support email config
+    private let supportEmail = "pouchcell26@gmail.com"
+    private let supportSubject = "PouchCellInspecter – Support / Feedback"
+    private var supportBody: String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—"
+        return """
+        Hi! I need help with:
+
+        App Version: \(version) (\(build))
+        Device: \(UIDevice.current.model)
+        iOS Version: \(UIDevice.current.systemVersion)
+
+        Details:
+        """
+    }
+
+    // UI state
+    @State private var showingMailComposer = false
+    @State private var showingMailUnavailableAlert = false
+
     private var availableVoices: [AVSpeechSynthesisVoice] {
         AVSpeechSynthesisVoice.speechVoices().sorted { (lhs, rhs) in
             (lhs.language, lhs.name) < (rhs.language, rhs.name)
@@ -51,16 +81,7 @@ struct MenuView: View {
         NavigationStack {
             List {
 
-                Section("Safety") {
-                    NavigationLink("Battery inspection disclaimer") {
-                        InfoDetailView(
-                            title: "Safety Disclaimer",
-                            message: "This app provides a visual inspection only and does not replace professional battery testing or safety procedures."
-                        )
-                    }
-                }
-
-                Section("Accessibility") {
+                                Section("Accessibility") {
                     Toggle("Speak results after scan", isOn: Binding(
                         get: { speechStore.settings.isEnabled },
                         set: { newValue in
@@ -75,6 +96,10 @@ struct MenuView: View {
                     ))
 
                     Text("The app can automatically read out the scan result after analysis.")
+
+                    // ✅ NEW: Haptics opt-in + helper text (and default OFF via @AppStorage above)
+                    Toggle("Enable Haptics", isOn: $haptics)
+                    Text("the app can use haptic feedback on the results screen (e.g., a stronger alert for bulging).")
 
                     if speechStore.settings.isEnabled {
                         VStack(alignment: .leading, spacing: 12) {
@@ -148,7 +173,25 @@ struct MenuView: View {
                     }
                 }
 
-                Section("Appearance") {
+                Section("Safety") {
+                    NavigationLink("Battery inspection disclaimer") {
+                        InfoDetailView(
+                            title: "Safety Disclaimer",
+                            message: "This app provides a visual inspection only and does not replace professional battery testing or safety procedures."
+                        )
+                    }
+                }
+
+                // New: camera-ish toggles
+                Section("Capture") {
+                    //Toggle("Show grid", isOn: $showGrid)
+                    //Toggle("High quality capture", isOn: $highQualityCapture)
+                    //Toggle("Auto torch", isOn: $autoTorch)
+                    Toggle("Save to Photos", isOn: $saveToPhotos)
+                    Text("automatically save pictures you've scanned using your iPhone's camera.")
+                }
+
+                    Section("Appearance") {
                     Picker("App appearance", selection: $appearance) {
                         ForEach(AppAppearance.allCases) { option in
                             Text(option.title).tag(option)
@@ -156,31 +199,79 @@ struct MenuView: View {
                     }
                 }
 
-                Section("About") {
-                    if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
-                        HStack {
-                            Text("App Version")
-                            Spacer()
-                            Text(version)
-                                .foregroundColor(.secondary)
-                        }
+                Section("Support") {
+                    Button {
+                        openContactUs()
+                    } label: {
+                        Label("Contact us", systemImage: "envelope")
                     }
 
-                    NavigationLink("Contact & feedback") {
+                    Button {
+                        openAppSettings()
+                    } label: {
+                        Label("Open iOS Settings", systemImage: "gearshape")
+                    }
+                }
+
+                // About section WITHOUT version here (so version can be the final row in the whole list)
+                Section("About") {
+                    NavigationLink("About this app") {
                         InfoDetailView(
-                            title: "Contact & Feedback",
-                            message: "For feedback or support, please contact our development team."
+                            title: "About",
+                            message: "PouchCellInspecter helps with visual inspection and scan-based analysis for pouch cells."
                         )
                     }
                 }
+
+                Section {
+                    HStack {
+                        Text("App Version")
+                        Spacer()
+                        Text(appVersionString)
+                            .foregroundColor(.secondary)
+                    }
+                }
             }
+            .listStyle(.insetGrouped)
             .navigationTitle("Menu")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Close") { dismiss() }
                 }
             }
+            .sheet(isPresented: $showingMailComposer) {
+                MailComposerView(
+                    recipients: [supportEmail],
+                    subject: supportSubject,
+                    body: supportBody
+                )
+            }
+            .alert("Mail not available", isPresented: $showingMailUnavailableAlert) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("Please set up Mail on this device to send email from within the app.")
+            }
         }
+    }
+
+    private func openContactUs() {
+        // In-app compose screen (no leaving the app)
+        if MFMailComposeViewController.canSendMail() {
+            showingMailComposer = true
+        } else {
+            showingMailUnavailableAlert = true
+        }
+    }
+
+    private func openAppSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        UIApplication.shared.open(url)
+    }
+
+    private var appVersionString: String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—"
+        return "\(version) (\(build))"
     }
 }
 
@@ -201,6 +292,45 @@ struct InfoDetailView: View {
         }
         .padding()
         .navigationTitle(title)
+    }
+}
+
+// MARK: - In-app Mail Composer
+
+struct MailComposerView: UIViewControllerRepresentable {
+    let recipients: [String]
+    let subject: String
+    let body: String
+
+    @Environment(\.dismiss) private var dismiss
+
+    func makeUIViewController(context: Context) -> MFMailComposeViewController {
+        let vc = MFMailComposeViewController()
+        vc.setToRecipients(recipients)
+        vc.setSubject(subject)
+        vc.setMessageBody(body, isHTML: false)
+        vc.mailComposeDelegate = context.coordinator
+        return vc
+    }
+
+    func updateUIViewController(_ uiViewController: MFMailComposeViewController, context: Context) { }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(dismiss: dismiss)
+    }
+
+    final class Coordinator: NSObject, MFMailComposeViewControllerDelegate {
+        let dismiss: DismissAction
+
+        init(dismiss: DismissAction) {
+            self.dismiss = dismiss
+        }
+
+        func mailComposeController(_ controller: MFMailComposeViewController,
+                                  didFinishWith result: MFMailComposeResult,
+                                  error: Error?) {
+            dismiss()
+        }
     }
 }
 

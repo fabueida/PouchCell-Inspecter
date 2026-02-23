@@ -64,7 +64,7 @@ struct SafetyTipContent {
     let whatToDoNow: [String]
     let prevention: [String]
     let whenToEscalate: [String]
-
+    
     static func forCondition(_ condition: BatteryCondition) -> SafetyTipContent {
         switch condition {
         case .normal:
@@ -88,7 +88,6 @@ struct SafetyTipContent {
                     "If the pouch begins to expand, treat it as bulging and follow the bulging guidance."
                 ]
             )
-
         case .bulging:
             return SafetyTipContent(
                 title: "Safety tips for: Bulging",
@@ -151,6 +150,10 @@ struct DetectionResultScreen: View {
     // Shared speech settings
     @EnvironmentObject private var speechStore: SpeechSettingsStore
     @State private var didSpeakResult = false
+
+    // Haptics (disabled by default; user can enable in Menu)
+    @AppStorage("pref_haptics") private var hapticsEnabled: Bool = false
+    @State private var didPlayHaptic = false
 
     private var condition: BatteryCondition { BatteryCondition(from: result) }
 
@@ -223,6 +226,7 @@ struct DetectionResultScreen: View {
                             }
                         } label: {
                             Text("Scan Again")
+                                .accessibilityHint("Scan again using a Pouch Cell Battery.")
                                 .font(.system(size: 20, weight: .medium))
                                 .foregroundColor(.black)
                                 .frame(maxWidth: .infinity)
@@ -236,6 +240,7 @@ struct DetectionResultScreen: View {
                             showSafetyTips = true
                         } label: {
                             Text("View Safety Tips")
+                                .accessibilityHint("Shows an overview on what to do depending on clasification result.")
                                 .font(.system(size: 20, weight: .medium))
                                 .foregroundColor(.black)
                                 .frame(maxWidth: .infinity)
@@ -262,6 +267,9 @@ struct DetectionResultScreen: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                     SpeechManager.shared.speak(phrase, settings: speechStore.settings)
                 }
+
+                // Haptic feedback once when the result appears.
+                playResultHapticsIfNeeded()
             }
             .onDisappear {
                 // Avoid lingering speech if the user dismisses quickly.
@@ -282,6 +290,41 @@ struct DetectionResultScreen: View {
                 SafetyTipsSheet(content: SafetyTipContent.forCondition(condition))
                     .presentationDetents([.medium, .large])
                     .presentationDragIndicator(.visible)
+            }
+        }
+    }
+
+    // MARK: - Haptics
+
+    private func playResultHapticsIfNeeded() {
+        guard hapticsEnabled, !didPlayHaptic else { return }
+        didPlayHaptic = true
+
+        // Small delay so it fires after the view fully presents.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            switch condition {
+            case .normal:
+                let gen = UINotificationFeedbackGenerator()
+                gen.prepare()
+                gen.notificationOccurred(.success)
+
+            case .bulging:
+                // Stronger + distinct “alert” feeling
+                let note = UINotificationFeedbackGenerator()
+                note.prepare()
+                note.notificationOccurred(.warning)
+
+                // Follow-up impact to make it feel more urgent.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
+                    let impact = UIImpactFeedbackGenerator(style: .heavy)
+                    impact.prepare()
+                    impact.impactOccurred()
+                }
+
+            case .unknown:
+                let note = UINotificationFeedbackGenerator()
+                note.prepare()
+                note.notificationOccurred(.warning)
             }
         }
     }
@@ -344,4 +387,5 @@ struct DetectionResultScreen_Previews: PreviewProvider {
             .environmentObject(SpeechSettingsStore.shared)
     }
 }
+
 
