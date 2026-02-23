@@ -38,12 +38,10 @@ struct MenuView: View {
 
     @Environment(\.dismiss) private var dismiss
 
-    // Shared speech settings used by the whole app
     @EnvironmentObject private var speechStore: SpeechSettingsStore
 
     @AppStorage("appAppearance") private var appearance: AppAppearance = .system
 
-    // Common camera-style settings (wire these into your camera screen later if desired)
     @AppStorage("pref_showGrid") private var showGrid: Bool = true
     @AppStorage("pref_saveToPhotos") private var saveToPhotos: Bool = true
 
