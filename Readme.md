@@ -1,20 +1,23 @@
+
 ⸻
 
-🔋 Pouch Cell Inspector
+Pouch Cell Inspector
 
-The battery pouch cells identifier application  is a cutting edge tool that uses machine-learning–powered computer vision to detect bulging lithium-ion pouch cells using only an iPhone camera.
+The Battery Pouch Cells identifier application is a cutting edge tool that uses machine-learning–powered computer vision to detect bulging lithium-ion pouch cells using only an iPhone camera.
 
 Built with Swift, SwiftUI, Vision, and CoreML, the app delivers a fast, reliable, and fully on-device battery safety inspection tool designed for:
-	•	🔧 Technicians
-	•	🧪 Engineers & researchers
-	•	🏭 Lab and industrial environments
-	•	📱 Field inspections
+	•	Technicians
+	•	Engineers and researchers
+	•	Lab and industrial environments
+	•	Field inspections
 
 The system emphasizes accuracy, accessibility, privacy, and real-world usability, enabling safe and consistent inspections without specialized hardware.
 
+A key design goal is inclusive use: the app is built with visually impaired  users in mind and supports a fully accessible workflow using VoiceOver, spoken feedback, and haptics.
+
 ⸻
 
-🎯 Project Purpose
+Project Purpose
 
 Lithium-ion pouch cells may bulge due to gas buildup, aging, overcharging, or internal failure. Swelling is an early warning sign of potential battery hazards.
 
@@ -30,9 +33,9 @@ This project is grounded in research on mobile computer vision for battery safet
 
 ⸻
 
-✨ Features
+Features
 
-🔍 Real-Time Bulging Detection
+Real-Time Classification Detection
 
 A trained CoreML model classifies pouch cells as:
 	•	Normal
@@ -42,7 +45,7 @@ Results are returned in seconds with confidence scores.
 
 ⸻
 
-📷 Flexible Image Sources
+Flexible Image Sources
 
 Users can inspect cells using:
 	•	Live camera capture
@@ -55,7 +58,7 @@ This allows:
 
 ⸻
 
-🧠 Intelligent Image Preprocessing
+Intelligent Image Preprocessing
 
 The app automatically:
 	•	Normalizes lighting
@@ -65,7 +68,7 @@ The app automatically:
 
 ⸻
 
-📊 Results & Confidence Metrics
+Results and Confidence Metrics
 
 Each inspection includes:
 	•	Classification result
@@ -73,25 +76,23 @@ Each inspection includes:
 	•	Timestamp
 	•	Optional notes
 
+In addition, the app can speak the result immediately after a scan, announcing the classification and confidence to support visually impaired  users.
+
 ⸻
 
-🗂 Local Inspection History
+Local Inspection History
 	•	Past inspections are saved automatically
 	•	Includes thumbnails and metadata
 	•	Enables traceability and later review
 
 ⸻
 
-📄 Report Generation
+Report Generation
 
-Export structured reports (PDF/JSON) for:
-	•	Lab documentation
-	•	Safety audits
-	•	Research records
 
 ⸻
 
-🔒 Fully Offline Processing
+Fully Offline Processing
 
 All ML inference happens on-device:
 	•	No internet required
@@ -100,24 +101,22 @@ All ML inference happens on-device:
 
 ⸻
 
-♿ Accessibility & Speech Support
+Accessibility and Multisensory Feedback
 
-Pouch Cell Inspector is designed for visually impaired, low-vision, and motor-impaired users.
+Pouch Cell Inspector is designed to be usable in industrial, lab, and field environments by users with a wide range of abilities, including visually impaired and low-vision users.
 
 Accessibility features include:
-	•	VoiceOver-friendly interface
-	•	Large, scalable text
-	•	High-contrast UI
-	•	Speech feedback for classification results
-	•	Audio + haptic confirmation cues
-	•	Guided capture instructions
-	•	Screen-reader-friendly error messages
+	•	Fully VoiceOver-accessible interface across the inspection workflow
+	•	Large, scalable text and high-contrast UI support
+	•	Spoken feedback after scanning that announces the classification result (and confidence), enabling eyes-free operation
+	•	Guided capture instructions and screen-reader-friendly error messages
+	•	Haptic feedback confirmation cues, including distinct haptic patterns by condition (for example, different haptic “feels” for Normal vs. Bulging), supporting users who may not be able to rely on sound or vision, including deaf-blind users
 
-These features ensure the inspection workflow remains usable in industrial, lab, and consumer environments, regardless of visual ability.
+These features help ensure inspections remain consistent, accessible, and safe without requiring specialized hardware.
 
 ⸻
 
-🛠 Built With
+Built With
 	•	Swift
 	•	SwiftUI
 	•	CoreML
@@ -127,9 +126,8 @@ These features ensure the inspection workflow remains usable in industrial, lab,
 
 ⸻
 
-🚀 Getting Started
-
-1️⃣ Clone the Repository
+Getting Started
+	1.	Clone the Repository
 
 git clone https://github.com/<your-org>/Pouch-Cell-Inspector.git
 cd Pouch-Cell-Inspector
@@ -137,7 +135,8 @@ cd Pouch-Cell-Inspector
 
 ⸻
 
-2️⃣ Requirements
+	2.	Requirements
+
 	•	macOS
 	•	Xcode 15+
 	•	iOS 14+ device or simulator
@@ -145,7 +144,7 @@ cd Pouch-Cell-Inspector
 
 ⸻
 
-3️⃣ Open in Xcode
+	3.	Open in Xcode
 
 open PouchCellInspector.xcodeproj
 
@@ -153,9 +152,9 @@ All dependencies are native to iOS — no external packages required.
 
 ⸻
 
-4️⃣ Run the App
-	1.	Select a simulator or physical device
-	2.	Press Run (⌘R)
+	4.	Run the App
+	5.	Select a simulator or physical device
+	6.	Press Run (Command + R)
 
 For physical devices:
 	•	Enable Developer Mode
@@ -163,7 +162,7 @@ For physical devices:
 
 ⸻
 
-🤖 Machine Learning Model
+Machine Learning Model
 
 The project includes:
 	•	A trained CoreML classification model
@@ -175,23 +174,22 @@ To replace the model:
 	2.	Place it in:
 
 PouchCellInspector/Model/
-
 	3.	Rebuild the project
 
 ⸻
 
-📚 Engineering & Research Documentation
+Engineering and Research Documentation
 
 This project follows structured software engineering and research practices, including:
 	•	Software Quality Assurance planning (testing strategy, reviews, defect tracking)
 	•	Software Project Planning (resources, risks, workflow)
 	•	Research-driven ML methodology for battery safety detection
 
-These practices ensure the system is built with a focus on reliability, safety, and real-world deployment readiness.
+These practices ensure the system is built with a focus on reliability, safety, accessibility, and real-world deployment readiness.
 
 ⸻
 
-🧪 Testing
+Testing
 	•	Unit tests
 	•	Integration tests
 	•	System tests
@@ -200,7 +198,7 @@ These practices ensure the system is built with a focus on reliability, safety, 
 
 ⸻
 
-🔮 Future Enhancements
+Future Enhancements
 	•	Cloud syncing for lab environments
 	•	Multi-cell batch scanning
 	•	Severity grading (beyond binary classification)
@@ -208,13 +206,13 @@ These practices ensure the system is built with a focus on reliability, safety, 
 
 ⸻
 
-🚧 Project Status
+Project Status
 
 Active development — features, UI, and model performance continue to improve.
 
 ⸻
 
-💡 Impact
+Impact
 
 Pouch Cell Inspector supports early detection of battery deformation, helping:
 	•	Improve operational safety
