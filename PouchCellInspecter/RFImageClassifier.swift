@@ -13,7 +13,8 @@ final class RFImageClassifier {
     private let model: RFClassifier
     private let classNames = [
         0: "Normal",
-        1: "Bulging"
+        1: "Bulging",
+        2: "Unknown"
     ]
     
     init() {

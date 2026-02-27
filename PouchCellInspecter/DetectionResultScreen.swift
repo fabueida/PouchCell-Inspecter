@@ -387,5 +387,3 @@ struct DetectionResultScreen_Previews: PreviewProvider {
             .environmentObject(SpeechSettingsStore.shared)
     }
 }
-
-

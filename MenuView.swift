@@ -2,7 +2,7 @@
 //  MenuView.swift
 //  PouchCellInspecter
 //
-//  Created by Firas Abueida on 1/20/26.
+//  Created by Firas Abueida on 11/25/25.
 //
 
 import SwiftUI
@@ -10,37 +10,60 @@ import AVFoundation
 import MessageUI
 import UIKit
 
-enum AppAppearance: String, CaseIterable, Identifiable {
-    case system
-    case light
-    case dark
 
-    var id: String { rawValue }
-
-    var title: String {
-        switch self {
-        case .system: return "System"
-        case .light: return "Light"
-        case .dark: return "Dark"
-        }
-    }
-
-    var colorScheme: ColorScheme? {
-        switch self {
-        case .system: return nil
-        case .light: return .light
-        case .dark: return .dark
-        }
-    }
-}
+//enum AppAppearance: String, CaseIterable, Identifiable {
+//    case system
+//    case light
+//    case dark
+//
+//    var id: String { rawValue }
+//
+//    var title: String {
+//        switch self {
+//        case .system: return "System"
+//        case .light: return "Light"
+//        case .dark: return "Dark"
+//        }
+//    }
+//
+//    var colorScheme: ColorScheme? {
+//        switch self {
+//        case .system: return nil
+//        case .light: return .light
+//        case .dark: return .dark
+//        }
+//    }
+//}
 
 struct MenuView: View {
 
     @Environment(\.dismiss) private var dismiss
-
     @EnvironmentObject private var speechStore: SpeechSettingsStore
+    @EnvironmentObject private var theme: ThemeManager
+    @Environment(\.colorScheme) private var systemScheme
 
-    @AppStorage("appAppearance") private var appearance: AppAppearance = .system
+//    @AppStorage("pref_showGrid") private var showGrid: Bool = true
+//    @AppStorage("pref_saveToPhotos") private var saveToPhotos: Bool = true
+//    @AppStorage("pref_haptics") private var haptics: Bool = false
+//
+//    private let supportEmail = "pouchcell26@gmail.com"
+//    private let supportSubject = "PouchCellInspecter – Support / Feedback"
+//    private var supportBody: String {
+//        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
+//        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—"
+//        return """
+//        Hi! I need help with:
+//
+//        App Version: \(version) (\(build))
+//        Device: \(UIDevice.current.model)
+//        iOS Version: \(UIDevice.current.systemVersion)
+//
+//        Details:
+//        """
+//    }
+
+    @State private var showingMailComposer = false
+    @State private var showingMailUnavailableAlert = false
 
     @AppStorage("pref_showGrid") private var showGrid: Bool = true
     @AppStorage("pref_saveToPhotos") private var saveToPhotos: Bool = true
@@ -66,47 +89,52 @@ struct MenuView: View {
     }
 
     // UI state
-    @State private var showingMailComposer = false
-    @State private var showingMailUnavailableAlert = false
+//    @State private var showingMailComposer = false
+//    @State private var showingMailUnavailableAlert = false
 
     private var availableVoices: [AVSpeechSynthesisVoice] {
         AVSpeechSynthesisVoice.speechVoices().sorted { (lhs, rhs) in
             (lhs.language, lhs.name) < (rhs.language, rhs.name)
         }
     }
+    
+
+    private var effectiveScheme: ColorScheme? {
+        // Key trick: "System" maps to current system scheme (not nil),
+        // so it updates immediately without dismissing the sheet.
+        theme.appearance == .system ? systemScheme : theme.appearance.colorScheme
+    }
 
     var body: some View {
         NavigationStack {
             List {
-
-                                Section("Accessibility") {
+                Section("Accessibility") {
                     Toggle("Speak results after scan", isOn: Binding(
                         get: { speechStore.settings.isEnabled },
                         set: { newValue in
                             var s = speechStore.settings
                             s.isEnabled = newValue
                             speechStore.settings = s
-
+                            
                             if !newValue {
                                 SpeechManager.shared.stop()
                             }
                         }
                     ))
-
+                    
                     Text("The app can automatically read out the scan result after analysis.")
-
-                    // ✅ NEW: Haptics opt-in + helper text (and default OFF via @AppStorage above)
+            
                     Toggle("Enable Haptics", isOn: $haptics)
-                    Text("the app can use haptic feedback on the results screen (e.g., a stronger alert for bulging).")
-
+                    Text("The app can use haptic feedback on the results screen (e.g., a stronger alert for bulging).")
+                    
                     if speechStore.settings.isEnabled {
                         VStack(alignment: .leading, spacing: 12) {
-
+                            
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("Speech rate")
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
-
+                                
                                 Slider(
                                     value: Binding(
                                         get: { speechStore.settings.rate },
@@ -119,12 +147,12 @@ struct MenuView: View {
                                     in: AVSpeechUtteranceMinimumSpeechRate...AVSpeechUtteranceMaximumSpeechRate
                                 )
                             }
-
+                            
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("Pitch")
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
-
+                                
                                 Slider(
                                     value: Binding(
                                         get: { speechStore.settings.pitch },
@@ -137,12 +165,12 @@ struct MenuView: View {
                                     in: 0.5...2.0
                                 )
                             }
-
+                            
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("Voice")
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
-
+                                
                                 Picker("Voice", selection: Binding(
                                     get: { speechStore.settings.voiceIdentifier ?? "" },
                                     set: { newValue in
@@ -152,14 +180,14 @@ struct MenuView: View {
                                     }
                                 )) {
                                     Text("System default").tag("")
-
+                                    
                                     ForEach(availableVoices, id: \.identifier) { voice in
                                         Text("\(voice.name) (\(voice.language))")
                                             .tag(voice.identifier)
                                     }
                                 }
                             }
-
+                            
                             Button {
                                 let sample = "Scan result reading is enabled."
                                 SpeechManager.shared.speak(sample, settings: speechStore.settings)
@@ -170,7 +198,7 @@ struct MenuView: View {
                         .padding(.vertical, 6)
                     }
                 }
-
+                
                 Section("Safety") {
                     NavigationLink("Battery inspection disclaimer") {
                         InfoDetailView(
@@ -179,7 +207,7 @@ struct MenuView: View {
                         )
                     }
                 }
-
+                
                 // New: camera-ish toggles
                 Section("Capture") {
                     //Toggle("Show grid", isOn: $showGrid)
@@ -188,29 +216,58 @@ struct MenuView: View {
                     Toggle("Save to Photos", isOn: $saveToPhotos)
                     Text("automatically save pictures you've scanned using your iPhone's camera.")
                 }
-
-                    Section("Appearance") {
-                    Picker("App appearance", selection: $appearance) {
+                
+                //                    Section("Appearance") {
+                //                    Picker("App appearance", selection: $appearance) {
+                ////=======
+                //                            Section("Capture") {
+                //                    //Toggle("Show grid", isOn: $showGrid)
+                //                    Toggle("Save to Photos", isOn: $saveToPhotos)
+                //                    Text("Automatically save pictures you've scanned using your iPhone's camera.")
+                //                }
+                
+                Section("Appearance") {
+                    Picker("App appearance", selection: $theme.appearance) {
+                        //>>>>>>> Stashed changes
                         ForEach(AppAppearance.allCases) { option in
                             Text(option.title).tag(option)
                         }
                     }
+                    .onChange(of: theme.appearance) { _, _ in
+                        // Keeps UIKit windows in sync immediately
+                        theme.apply()
+                    }
                 }
-
+                
+                //                Section("Support") {
+                //                    Button {
+                //                        openContactUs()
+                //                    } label: {
+                //                        Label("Contact us", systemImage: "envelope")
+                //                    }
+                //
+                //                    Button {
+                //                        openAppSettings()
+                //                    } label: {
+                //                        Label("Open iOS Settings", systemImage: "gearshape")
+                //                    }
+                //                }
+                
+                //<<<<<<< Updated upstream
                 Section("Support") {
                     Button {
                         openContactUs()
                     } label: {
                         Label("Contact us", systemImage: "envelope")
                     }
-
+                    
                     Button {
                         openAppSettings()
                     } label: {
                         Label("Open iOS Settings", systemImage: "gearshape")
                     }
                 }
-
+                
                 // About section WITHOUT version here (so version can be the final row in the whole list)
                 Section("About") {
                     NavigationLink("About this app") {
@@ -220,7 +277,15 @@ struct MenuView: View {
                         )
                     }
                 }
-
+                //=======
+                //                Section("About") {
+                //                    NavigationLink {
+                //                        AboutScreen()
+                //                    } label: {
+                //                        Label("Learn more about Pouch Cell Inspector", systemImage: "book")
+                //                    }
+                //                }
+                
                 Section {
                     HStack {
                         Text("App Version")
@@ -237,6 +302,8 @@ struct MenuView: View {
                     Button("Close") { dismiss() }
                 }
             }
+            // ✅ Critical change: use effectiveScheme (never nil), so System updates instantly
+            .preferredColorScheme(effectiveScheme)
             .sheet(isPresented: $showingMailComposer) {
                 MailComposerView(
                     recipients: [supportEmail],
@@ -251,9 +318,7 @@ struct MenuView: View {
             }
         }
     }
-
     private func openContactUs() {
-        // In-app compose screen (no leaving the app)
         if MFMailComposeViewController.canSendMail() {
             showingMailComposer = true
         } else {
@@ -272,6 +337,8 @@ struct MenuView: View {
         return "\(version) (\(build))"
     }
 }
+    
+                                    
 
 struct InfoDetailView: View {
     let title: String
@@ -331,10 +398,11 @@ struct MailComposerView: UIViewControllerRepresentable {
         }
     }
 }
+                                    
 
 #Preview {
     MenuView()
         .environmentObject(SpeechSettingsStore.shared)
+        .environmentObject(ThemeManager.shared)
 }
-
 
