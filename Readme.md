@@ -1,10 +1,7 @@
----
-
-## Pouch Cell Inspector
+Pouch Cell Inspector
 
 The Battery Pouch Cells identifier application is a cutting edge tool that uses machine-learning–powered computer vision to detect bulging lithium-ion pouch cells using only an iPhone camera.
-
-Built with Swift, SwiftUI, Vision, and CoreML, the app delivers a fast, reliable, and fully on-device battery safety inspection tool designed for:
+ This application delivers a fast, reliable, and fully on-device battery safety inspection tool designed for:
 - Technicians  
 - Engineers and researchers  
 - Lab and industrial environments  
@@ -23,7 +20,7 @@ Lithium-ion pouch cells may bulge due to gas buildup, aging, overcharging, or in
 Pouch Cell Inspector was developed to:
 - Provide rapid visual safety checks  
 - Reduce reliance on subjective manual inspection  
-- Deliver consistent ML-based classification  
+- Deliver consistent machine learning-based classification  
 - Support documentation and traceability  
 - Enable accessible inspection workflows  
 - Operate fully offline for data privacy  
@@ -54,6 +51,8 @@ This allows:
 - Field use in varied environments  
 - Reviewing previously captured images  
 - Safer analysis when live alignment is difficult  
+
+Even if you do not have a pouch cell in front of you, live camera capture can still be used by scanning another device with an online image of the given pouch cell, while still delivering real time classification results.  
 
 ---
 
