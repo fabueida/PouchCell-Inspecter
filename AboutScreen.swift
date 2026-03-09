@@ -20,8 +20,7 @@ struct AboutScreen: View {
                     systemImage: "house.fill",
                     bullets: [
                         "Tap Take picture to capture a photo and scan.",
-                        "Tap Take picture to capture a photo and scan.",
-                        "Or tap Import from library to scan a saved image.",
+                                                "Or tap Import from library to scan a saved image.",
                         "You can use either option even if you don’t have a pouch cell in front of you (sample images work too)."
                     ]
                 )

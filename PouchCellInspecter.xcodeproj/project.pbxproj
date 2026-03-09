@@ -9,19 +9,20 @@
 /* Begin PBXBuildFile section */
 		8806F3B92EE0B0B50082B105 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8806F3B82EE0B0B50082B105 /* CameraView.swift */; };
 		880BCC502EEDF9F900089BB3 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 880BCC4F2EEDF9F900089BB3 /* AppTheme.swift */; };
-		88218B0A2F3FC04A00AD0FEB /* SafetyInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88218B092F3FC04A00AD0FEB /* SafetyInfoView.swift */; };
 		882919952EECB76F0050C8A8 /* CameraPermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 882919942EECB76F0050C8A8 /* CameraPermissionManager.swift */; };
 		883754502F16E74A00021F8D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 883754402F16E74A00021F8D /* Assets.xcassets */; };
 		8846F77D2F2407BA0011F803 /* SpeechManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8846F77C2F2407BA0011F803 /* SpeechManager.swift */; };
 		8846F77F2F2407F00011F803 /* SpeechSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8846F77E2F2407F00011F803 /* SpeechSettings.swift */; };
-		884F09042F3ED44E00EEA2A4 /* SpeechSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884F09032F3ED44E00EEA2A4 /* SpeechSettingsStore.swift */; };
+		8870A8F92F52235600415D56 /* SpeechSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8870A8F82F52235600415D56 /* SpeechSettingsStore.swift */; };
+		887C45892F5224200033D7A2 /* PhotoPermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887C45882F5224200033D7A2 /* PhotoPermissionManager.swift */; };
+		887C458B2F5225140033D7A2 /* EmbeddedCameraPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887C458A2F5225140033D7A2 /* EmbeddedCameraPreview.swift */; };
+		887C458D2F52273F0033D7A2 /* AboutScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 887C458C2F52273F0033D7A2 /* AboutScreen.swift */; };
 		888364702F200CAA00CB5773 /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8883646F2F200CAA00CB5773 /* MenuView.swift */; };
+		8890241B2F5CCAC400EA3E49 /* PrivacyPolicyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8890241A2F5CCAC400EA3E49 /* PrivacyPolicyView.swift */; };
 		88ACF8872F2AB78400C00B33 /* OnboardingContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88ACF8862F2AB78400C00B33 /* OnboardingContainerView.swift */; };
 		88ACF8892F2AB95F00C00B33 /* OnboardingPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88ACF8882F2AB95F00C00B33 /* OnboardingPageView.swift */; };
-		88B6C9892F2964A300AEC090 /* PhotoPermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B6C9882F2964A300AEC090 /* PhotoPermissionManager.swift */; };
 		88B6C98B2F29651E00AEC090 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B6C98A2F29651E00AEC090 /* ImagePicker.swift */; };
 		88C3163B2F2BDC1F004DDDF7 /* SpeechFeedbackTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88C3163A2F2BDC1F004DDDF7 /* SpeechFeedbackTip.swift */; };
-		88CAB1AE2F4CD20F00B0ACF9 /* RFClassifier.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 88CAB1AD2F4CD20F00B0ACF9 /* RFClassifier.mlmodel */; };
 		DC34875A2EF1F5750006D3AE /* AllViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3487512EF1F5750006D3AE /* AllViews.swift */; };
 /* End PBXBuildFile section */
 
@@ -38,20 +39,21 @@
 /* Begin PBXFileReference section */
 		8806F3B82EE0B0B50082B105 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		880BCC4F2EEDF9F900089BB3 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
-		88218B092F3FC04A00AD0FEB /* SafetyInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafetyInfoView.swift; sourceTree = "<group>"; };
 		882919942EECB76F0050C8A8 /* CameraPermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPermissionManager.swift; sourceTree = "<group>"; };
 		883754402F16E74A00021F8D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		8846F77C2F2407BA0011F803 /* SpeechManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechManager.swift; sourceTree = "<group>"; };
 		8846F77E2F2407F00011F803 /* SpeechSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSettings.swift; sourceTree = "<group>"; };
-		884F09032F3ED44E00EEA2A4 /* SpeechSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSettingsStore.swift; sourceTree = "<group>"; };
+		8870A8F82F52235600415D56 /* SpeechSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSettingsStore.swift; sourceTree = "<group>"; };
+		887C45882F5224200033D7A2 /* PhotoPermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPermissionManager.swift; sourceTree = "<group>"; };
+		887C458A2F5225140033D7A2 /* EmbeddedCameraPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedCameraPreview.swift; sourceTree = "<group>"; };
+		887C458C2F52273F0033D7A2 /* AboutScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutScreen.swift; sourceTree = "<group>"; };
 		8883646F2F200CAA00CB5773 /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		888AF1352ED64B9500EB16CC /* PouchCellInspecter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PouchCellInspecter.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8890241A2F5CCAC400EA3E49 /* PrivacyPolicyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyView.swift; sourceTree = "<group>"; };
 		88ACF8862F2AB78400C00B33 /* OnboardingContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingContainerView.swift; sourceTree = "<group>"; };
 		88ACF8882F2AB95F00C00B33 /* OnboardingPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPageView.swift; sourceTree = "<group>"; };
-		88B6C9882F2964A300AEC090 /* PhotoPermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPermissionManager.swift; sourceTree = "<group>"; };
 		88B6C98A2F29651E00AEC090 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		88C3163A2F2BDC1F004DDDF7 /* SpeechFeedbackTip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechFeedbackTip.swift; sourceTree = "<group>"; };
-		88CAB1AD2F4CD20F00B0ACF9 /* RFClassifier.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = RFClassifier.mlmodel; sourceTree = "<group>"; };
 		DC3487512EF1F5750006D3AE /* AllViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllViews.swift; sourceTree = "<group>"; };
 		DC46066D2EF00788005EB67B /* PouchCellInspecterTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PouchCellInspecterTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -111,14 +113,16 @@
 		888AF12C2ED64B9500EB16CC = {
 			isa = PBXGroup;
 			children = (
-				88218B092F3FC04A00AD0FEB /* SafetyInfoView.swift */,
+				887C458A2F5225140033D7A2 /* EmbeddedCameraPreview.swift */,
 				88C3163A2F2BDC1F004DDDF7 /* SpeechFeedbackTip.swift */,
-				88B6C9882F2964A300AEC090 /* PhotoPermissionManager.swift */,
 				88B6C98A2F29651E00AEC090 /* ImagePicker.swift */,
+				887C45882F5224200033D7A2 /* PhotoPermissionManager.swift */,
 				8883646F2F200CAA00CB5773 /* MenuView.swift */,
+				8890241A2F5CCAC400EA3E49 /* PrivacyPolicyView.swift */,
+				887C458C2F52273F0033D7A2 /* AboutScreen.swift */,
 				8846F77C2F2407BA0011F803 /* SpeechManager.swift */,
-				884F09032F3ED44E00EEA2A4 /* SpeechSettingsStore.swift */,
 				8846F77E2F2407F00011F803 /* SpeechSettings.swift */,
+				8870A8F82F52235600415D56 /* SpeechSettingsStore.swift */,
 				DC3487512EF1F5750006D3AE /* AllViews.swift */,
 				88ACF8862F2AB78400C00B33 /* OnboardingContainerView.swift */,
 				88ACF8882F2AB95F00C00B33 /* OnboardingPageView.swift */,
@@ -126,7 +130,6 @@
 				883754402F16E74A00021F8D /* Assets.xcassets */,
 				880BCC4F2EEDF9F900089BB3 /* AppTheme.swift */,
 				882919942EECB76F0050C8A8 /* CameraPermissionManager.swift */,
-				88CAB1AD2F4CD20F00B0ACF9 /* RFClassifier.mlmodel */,
 				888AF1372ED64B9500EB16CC /* PouchCellInspecter */,
 				DC46066E2EF00788005EB67B /* PouchCellInspecterTests */,
 				888AF1362ED64B9500EB16CC /* Products */,
@@ -252,21 +255,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				887C45892F5224200033D7A2 /* PhotoPermissionManager.swift in Sources */,
+				8870A8F92F52235600415D56 /* SpeechSettingsStore.swift in Sources */,
 				880BCC502EEDF9F900089BB3 /* AppTheme.swift in Sources */,
+				8890241B2F5CCAC400EA3E49 /* PrivacyPolicyView.swift in Sources */,
 				8846F77D2F2407BA0011F803 /* SpeechManager.swift in Sources */,
-				88CAB1AE2F4CD20F00B0ACF9 /* RFClassifier.mlmodel in Sources */,
-				884F09042F3ED44E00EEA2A4 /* SpeechSettingsStore.swift in Sources */,
+				887C458D2F52273F0033D7A2 /* AboutScreen.swift in Sources */,
 				8846F77F2F2407F00011F803 /* SpeechSettings.swift in Sources */,
 				888364702F200CAA00CB5773 /* MenuView.swift in Sources */,
 				882919952EECB76F0050C8A8 /* CameraPermissionManager.swift in Sources */,
 				DC34875A2EF1F5750006D3AE /* AllViews.swift in Sources */,
-				88218B0A2F3FC04A00AD0FEB /* SafetyInfoView.swift in Sources */,
 				88C3163B2F2BDC1F004DDDF7 /* SpeechFeedbackTip.swift in Sources */,
 				88ACF8892F2AB95F00C00B33 /* OnboardingPageView.swift in Sources */,
 				88B6C98B2F29651E00AEC090 /* ImagePicker.swift in Sources */,
-				88B6C9892F2964A300AEC090 /* PhotoPermissionManager.swift in Sources */,
 				88ACF8872F2AB78400C00B33 /* OnboardingContainerView.swift in Sources */,
 				8806F3B92EE0B0B50082B105 /* CameraView.swift in Sources */,
+				887C458B2F5225140033D7A2 /* EmbeddedCameraPreview.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -415,15 +419,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				DEVELOPMENT_TEAM = 748PM6VCVK;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PouchCellInspecter/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Pouch Cell Inspector";
+				INFOPLIST_KEY_CFBundleDisplayName = "Pouch  Cell Inspector";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSCameraUsageDescription = "“We use the camera to take a picture of your battery to determine if your battery is bulging.”";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This allows the app to analyze lithium-ion pouch batteries and provide safety-related information.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "“We need access to your camera so we can take a photo of your battery and determine it's condition.”";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This allows the app to analyze lithium-ion pouch batteries and provide safety-related information, as well as to optionally save pictures you've scanned using a pouch cell.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -434,7 +438,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1.3;
+				MARKETING_VERSION = 0.1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = oqubak.PouchCellInspecter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -453,15 +457,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				DEVELOPMENT_TEAM = 748PM6VCVK;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PouchCellInspecter/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Pouch Cell Inspector";
+				INFOPLIST_KEY_CFBundleDisplayName = "Pouch  Cell Inspector";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSCameraUsageDescription = "“We use the camera to take a picture of your battery to determine if your battery is bulging.”";
-				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This allows the app to analyze lithium-ion pouch batteries and provide safety-related information.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "“We need access to your camera so we can take a photo of your battery and determine it's condition.”";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This allows the app to analyze lithium-ion pouch batteries and provide safety-related information, as well as to optionally save pictures you've scanned using a pouch cell.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -472,7 +476,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1.3;
+				MARKETING_VERSION = 0.1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = oqubak.PouchCellInspecter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;

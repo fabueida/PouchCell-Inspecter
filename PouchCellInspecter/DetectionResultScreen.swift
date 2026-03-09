@@ -142,8 +142,7 @@ struct DetectionResultScreen: View {
     // ✅ NEW: scanned/imported image
     let scannedImage: UIImage?
 
-    let onScanAgain: () -> Void
-
+    
     @Environment(\.dismiss) private var dismiss
     @State private var showSafetyTips = false
 
@@ -157,13 +156,7 @@ struct DetectionResultScreen: View {
 
     private var condition: BatteryCondition { BatteryCondition(from: result) }
 
-    init(result: String, scannedImage: UIImage? = nil, onScanAgain: @escaping () -> Void) {
-        self.result = result
-        self.scannedImage = scannedImage
-        self.onScanAgain = onScanAgain
-    }
-
-    var body: some View {
+            var body: some View {
         NavigationStack {
             ZStack {
                 // Background (same as other screens)
@@ -219,23 +212,7 @@ struct DetectionResultScreen: View {
 
                     // Buttons
                     VStack(spacing: 20) {
-                        Button {
-                            dismiss()
-                            DispatchQueue.main.async {
-                                onScanAgain()
-                            }
-                        } label: {
-                            Text("Scan Again")
-                                .accessibilityHint("Scan again using a Pouch Cell Battery.")
-                                .font(.system(size: 20, weight: .medium))
-                                .foregroundColor(.black)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
-                                .background(Color(red: 0.73, green: 0.81, blue: 0.86))
-                                .cornerRadius(14)
-                        }
-                        .padding(.horizontal, 60)
-
+                        
                         Button {
                             showSafetyTips = true
                         } label: {
@@ -383,7 +360,7 @@ struct SafetyTipsSheet: View {
 
 struct DetectionResultScreen_Previews: PreviewProvider {
     static var previews: some View {
-        DetectionResultScreen(result: "Normal", scannedImage: nil, onScanAgain: {})
+        DetectionResultScreen(result: "Normal", scannedImage: nil)
             .environmentObject(SpeechSettingsStore.shared)
     }
 }

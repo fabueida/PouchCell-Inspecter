@@ -22,6 +22,9 @@ struct HomeScreen: View {
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
     @AppStorage("didAnnounceSpeechTip") private var didAnnounceSpeechTip = false
 
+    // ✅ Use the Menu toggle here
+    @AppStorage("pref_saveToPhotos") private var saveToPhotos: Bool = false
+
     @StateObject private var cameraManager = CameraPermissionManager()
     @StateObject private var photoPermissionManager = PhotoPermissionManager()
 
@@ -34,10 +37,14 @@ struct HomeScreen: View {
     @State private var showLoading = false
     @State private var resultPayload: DetectionResultPayload?
 
-    // ✅ FIX: Correct classifier type name
     @State private var cameraGranted = false
 
+    // ✅ Save-to-Photos UX
+    @State private var showSaveToPhotosAlert = false
+
     private let classifier = DTImageClassifier()
+
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         NavigationStack {
@@ -83,6 +90,7 @@ struct HomeScreen: View {
 
                     if !cameraGranted {
                         VStack(spacing: 12) {
+                            Text("Camera disabled.")
                             Text("Camera access is required to scan a battery.")
                                 .font(.system(size: 16, weight: .semibold))
                                 .multilineTextAlignment(.center)
@@ -90,7 +98,7 @@ struct HomeScreen: View {
                             Button {
                                 Task { await requestCameraPermissionAndStart(silentIfDenied: false) }
                             } label: {
-                                Label("Enable Camera", systemImage: "camera.fill")
+                                Label("Open Settings", systemImage: "camera.fill")
                                     .font(.system(size: 18, weight: .semibold))
                                     .foregroundColor(.white)
                                     .frame(maxWidth: .infinity)
@@ -98,7 +106,7 @@ struct HomeScreen: View {
                                     .background(AppTheme.accent)
                                     .cornerRadius(16)
                             }
-                            
+
                             Button {
                                 Task {
                                     let granted = await photoPermissionManager.requestPermissionAsync()
@@ -115,7 +123,6 @@ struct HomeScreen: View {
                                             .stroke(AppTheme.accent, lineWidth: 2)
                                     )
                             }
-                            //.accessibilityHint("Choose an image of a lithium pouch cell battery from your library and get a result.")
                         }
                         .padding(.horizontal, 28)
                         .padding(.vertical, 18)
@@ -127,7 +134,6 @@ struct HomeScreen: View {
 
                         HStack(spacing: 28) {
 
-                            // Flash / Torch
                             Button {
                                 embeddedCamera.toggleFlash()
                             } label: {
@@ -139,9 +145,8 @@ struct HomeScreen: View {
                                     .clipShape(Circle())
                             }
                             .accessibilityLabel(embeddedCamera.isTorchOn ? "Flash on" : "Flash off")
-                                                        .accessibilityHint("Double tap to toggle the camera flash.")
+                            .accessibilityHint("Double tap to toggle the camera flash.")
 
-                            // Capture
                             Button {
                                 embeddedCamera.capture()
                             } label: {
@@ -159,7 +164,6 @@ struct HomeScreen: View {
                             .accessibilityHint("Double tap to take a picture of a lithium pouch cell battery.")
                             .popoverTip(SpeechFeedbackTip())
 
-                            // Import
                             Button {
                                 Task {
                                     let granted = await photoPermissionManager.requestPermissionAsync()
@@ -206,6 +210,12 @@ struct HomeScreen: View {
             .onAppear {
                 embeddedCamera.onCapture = { image in
                     capturedImage = image
+
+                    // ✅ Save to Photos only for camera scans (not imports)
+                    if saveToPhotos {
+                        Task { await saveScanToPhotosIfAllowed(image) }
+                    }
+
                     runClassification()
                 }
 
@@ -215,6 +225,22 @@ struct HomeScreen: View {
                 if granted {
                     embeddedCamera.startSessionIfNeeded()
                 } else {
+                    embeddedCamera.stopSessionIfNeeded()
+                }
+            }
+            .onChange(of: scenePhase) {
+                guard scenePhase == .active else { return }
+
+                cameraManager.refreshStatus()
+                photoPermissionManager.refreshStatus()
+
+                if cameraManager.permissionGranted && !cameraGranted {
+                    cameraGranted = true
+                    embeddedCamera.startSessionIfNeeded()
+                }
+
+                if !cameraManager.permissionGranted && cameraGranted {
+                    cameraGranted = false
                     embeddedCamera.stopSessionIfNeeded()
                 }
             }
@@ -242,25 +268,91 @@ struct HomeScreen: View {
         .sheet(item: $resultPayload) { payload in
             DetectionResultScreen(
                 result: payload.result,
-                scannedImage: payload.image,
-                onScanAgain: { }
+                scannedImage: payload.image
             )
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
+                }
+        .alert("Photo Access Required", isPresented: $photoPermissionManager.showPermissionAlert) {
+            Button("Open Settings") { photoPermissionManager.openSettings() }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("Please enable photo access in Settings to import an image.")
+        }
+
+        // ✅ Save-to-Photos alert (only shown if user enabled saving, but iOS blocks saving)
+        .alert("Can’t Save to Photos", isPresented: $showSaveToPhotosAlert) {
+            Button("Open Settings") { openAppSettings() }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("To save scans to your Photos library, allow Photos access in Settings.")
         }
     }
 
     // MARK: - Permissions
 
     private func requestCameraPermissionAndStart(silentIfDenied: Bool) async {
-        let granted = await cameraManager.requestPermissionAsync()
-        await MainActor.run {
-            self.cameraGranted = granted
+        let status = cameraManager.currentStatus()
+
+        if status == .denied || status == .restricted {
+            await MainActor.run { self.cameraGranted = false }
+            if !silentIfDenied {
+                await MainActor.run { cameraManager.openSettings() }
+            }
+            return
         }
+
+        let granted = await cameraManager.requestPermissionAsync()
+        await MainActor.run { self.cameraGranted = granted }
 
         if granted {
             embeddedCamera.startSessionIfNeeded()
         }
+    }
+
+    // MARK: - Save to Photos
+
+    private func saveScanToPhotosIfAllowed(_ image: UIImage) async {
+        // Use add-only authorization for saving
+        let status = PHPhotoLibrary.authorizationStatus(for: .addOnly)
+
+        if status == .authorized {
+            await createPhotoAsset(image)
+            return
+        }
+
+        if status == .denied || status == .restricted {
+            await MainActor.run { showSaveToPhotosAlert = true }
+            return
+        }
+
+        // .notDetermined -> request add-only
+        let granted = await withCheckedContinuation { continuation in
+            PHPhotoLibrary.requestAuthorization(for: .addOnly) { newStatus in
+                continuation.resume(returning: newStatus == .authorized)
+            }
+        }
+
+        if granted {
+            await createPhotoAsset(image)
+        } else {
+            await MainActor.run { showSaveToPhotosAlert = true }
+        }
+    }
+
+    private func createPhotoAsset(_ image: UIImage) async {
+        await withCheckedContinuation { continuation in
+            PHPhotoLibrary.shared().performChanges({
+                PHAssetChangeRequest.creationRequestForAsset(from: image)
+            }) { _, _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    private func openAppSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        UIApplication.shared.open(url)
     }
 
     // MARK: - Classification
@@ -289,4 +381,3 @@ struct HomeScreen: View {
         }
     }
 }
-

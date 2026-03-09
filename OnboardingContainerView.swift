@@ -8,12 +8,17 @@
 import SwiftUI
 
 struct OnboardingContainerView: View {
-    
+
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
     @State private var currentPage = 0
-    
+
+    private let lastPageIndex = 1
+
     var body: some View {
-        VStack {
+        VStack(spacing: 0) {
+
+            header
+
             TabView(selection: $currentPage) {
                 OnboardingPageView(
                     imageName: "onboardingIcon",
@@ -22,9 +27,8 @@ struct OnboardingContainerView: View {
                     subtitle: "Check if a lithium-ion pouch battery is safe in seconds.",
                     features: []
                 )
+                .tag(0)
 
-                                .tag(0)
-                
                 OnboardingPageView(
                     imageName: "onboardingIcon",
                     title: "How It Works",
@@ -37,16 +41,18 @@ struct OnboardingContainerView: View {
                 )
                 .tag(1)
             }
-            .tabViewStyle(.page)
-            
+            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .always))
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .contentShape(Rectangle()) // improves swipe hit-testing
+
             Button {
-                if currentPage < 1 {
-                    currentPage += 1
+                if currentPage < lastPageIndex {
+                    withAnimation(.easeInOut) { currentPage += 1 }
                 } else {
                     hasSeenOnboarding = true
                 }
             } label: {
-                Text(currentPage < 1 ? "Continue" : "Get Started")
+                Text(currentPage < lastPageIndex ? "Continue" : "Get Started")
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding()
@@ -55,4 +61,42 @@ struct OnboardingContainerView: View {
             .padding()
         }
     }
+
+    private var header: some View {
+        HStack(spacing: 12) {
+            // Polished "app icon" treatment for the header
+            Image("PouchCellIcon")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 30, height: 30)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .strokeBorder(.primary.opacity(0.08), lineWidth: 1)
+                )
+                .background(
+                    // This helps the icon look good on both light/dark backgrounds
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .fill(.ultraThinMaterial)
+                )
+                .shadow(color: .black.opacity(0.10), radius: 6, x: 0, y: 3)
+                .accessibilityLabel("Pouch Cell Inspector")
+
+            Text("Pouch Cell Inspector")
+                .font(.headline)
+
+            Spacer()
+
+            Button("Skip") {
+                hasSeenOnboarding = true
+            }
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            .accessibilityLabel("Skip onboarding")
+        }
+        .padding(.horizontal)
+        .padding(.top, 14)
+        .padding(.bottom, 8)
+    }
 }
+
