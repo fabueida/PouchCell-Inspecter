@@ -15,6 +15,7 @@
 		8846F77F2F2407F00011F803 /* SpeechSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8846F77E2F2407F00011F803 /* SpeechSettings.swift */; };
 		88811CBD2F66083C00662F0E /* SpeechSettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88811CBC2F66083C00662F0E /* SpeechSettingsStore.swift */; };
 		88811E372F6609F600662F0E /* AboutScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88811E362F6609F600662F0E /* AboutScreen.swift */; };
+		88811E972F660A7A00662F0E /* PrivacyPolicyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88811E962F660A7A00662F0E /* PrivacyPolicyView.swift */; };
 		888364702F200CAA00CB5773 /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8883646F2F200CAA00CB5773 /* MenuView.swift */; };
 		88ACF8872F2AB78400C00B33 /* OnboardingContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88ACF8862F2AB78400C00B33 /* OnboardingContainerView.swift */; };
 		88ACF8892F2AB95F00C00B33 /* OnboardingPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88ACF8882F2AB95F00C00B33 /* OnboardingPageView.swift */; };
@@ -44,6 +45,7 @@
 		8846F77E2F2407F00011F803 /* SpeechSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSettings.swift; sourceTree = "<group>"; };
 		88811CBC2F66083C00662F0E /* SpeechSettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSettingsStore.swift; sourceTree = "<group>"; };
 		88811E362F6609F600662F0E /* AboutScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutScreen.swift; sourceTree = "<group>"; };
+		88811E962F660A7A00662F0E /* PrivacyPolicyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyPolicyView.swift; sourceTree = "<group>"; };
 		8883646F2F200CAA00CB5773 /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		888AF1352ED64B9500EB16CC /* PouchCellInspecter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PouchCellInspecter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		88ACF8862F2AB78400C00B33 /* OnboardingContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingContainerView.swift; sourceTree = "<group>"; };
@@ -117,6 +119,7 @@
 				88B6C9882F2964A300AEC090 /* PhotoPermissionManager.swift */,
 				88B6C98A2F29651E00AEC090 /* ImagePicker.swift */,
 				8883646F2F200CAA00CB5773 /* MenuView.swift */,
+				88811E962F660A7A00662F0E /* PrivacyPolicyView.swift */,
 				8846F77C2F2407BA0011F803 /* SpeechManager.swift */,
 				88811E362F6609F600662F0E /* AboutScreen.swift */,
 				8846F77E2F2407F00011F803 /* SpeechSettings.swift */,
@@ -255,6 +258,7 @@
 				88811CBD2F66083C00662F0E /* SpeechSettingsStore.swift in Sources */,
 				88C0A4112F66072700CE97CB /* EmbeddedCameraPreview.swift in Sources */,
 				880BCC502EEDF9F900089BB3 /* AppTheme.swift in Sources */,
+				88811E972F660A7A00662F0E /* PrivacyPolicyView.swift in Sources */,
 				8846F77D2F2407BA0011F803 /* SpeechManager.swift in Sources */,
 				88811E372F6609F600662F0E /* AboutScreen.swift in Sources */,
 				8846F77F2F2407F00011F803 /* SpeechSettings.swift in Sources */,
