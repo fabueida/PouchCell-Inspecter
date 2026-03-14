@@ -35,3 +35,4 @@ final class SpeechSettingsStore: ObservableObject {
         return decoded
     }
 }
+
