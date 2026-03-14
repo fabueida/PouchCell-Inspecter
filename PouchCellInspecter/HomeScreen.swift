@@ -9,6 +9,7 @@ import SwiftUI
 import Photos
 import UIKit
 import TipKit
+import AVFoundation
 
 private struct DetectionResultPayload: Identifiable {
     let id = UUID()
@@ -21,104 +22,233 @@ struct HomeScreen: View {
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
     @AppStorage("didAnnounceSpeechTip") private var didAnnounceSpeechTip = false
 
+    // ✅ Use the Menu toggle here
+    @AppStorage("pref_saveToPhotos") private var saveToPhotos: Bool = false
+
     @StateObject private var cameraManager = CameraPermissionManager()
     @StateObject private var photoPermissionManager = PhotoPermissionManager()
 
+    @StateObject private var embeddedCamera = EmbeddedCameraModel()
+
     @State private var showMenu = false
-    @State private var showCamera = false
     @State private var showUIKitPicker = false
 
     @State private var capturedImage: UIImage?
     @State private var showLoading = false
-
     @State private var resultPayload: DetectionResultPayload?
 
-    // ✅ FIX: Correct classifier type name
-//    private let classifier = DTImageClassifier()
-    private let classifier = RFImageClassifier()
+    @State private var cameraGranted = false
+
+    // ✅ Save-to-Photos UX
+    @State private var showSaveToPhotosAlert = false
+
+    private let classifier = DTImageClassifier()
+
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         NavigationStack {
             ZStack {
-                AppTheme.background
-                    .ignoresSafeArea()
-                    .allowsHitTesting(false)
 
-                VStack(spacing: 36) {
-
-                    Text("PouchCell Inspector")
-                        .font(.system(size: 32, weight: .bold))
-
-                    Spacer()
-
-                    Button {
-                        Task {
-                            let granted = await cameraManager.requestPermissionAsync()
-                            if granted { showCamera = true }
-                        }
-                    } label: {
-                        Label("Scan", systemImage: "camera.fill")
-                            .font(.system(size: 20, weight: .semibold))
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 20)
-                            .background(AppTheme.accent)
-                            .cornerRadius(18)
-                            .accessibilityHint("Double tap to open the camera and take a picture of a lithium pouch cell battery.")
-                    }
-                    .padding(.horizontal, 32)
-                    .popoverTip(SpeechFeedbackTip())
-
-                    Button {
-                        Task {
-                            let granted = await photoPermissionManager.requestPermissionAsync()
-                            if granted { showUIKitPicker = true }
-                        }
-                    } label: {
-                        Label("Import from Library", systemImage: "photo.on.rectangle")
-                            .font(.system(size: 17, weight: .medium))
-                            .foregroundColor(AppTheme.accent)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 14)
-                            .background(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .stroke(AppTheme.accent, lineWidth: 2)
-                                    .accessibilityHint("Choose an image of a lithium pouch cell battery that you've saved and get a result.")
-                            )
-                    }
-                    .padding(.horizontal, 64)
-
-                    // ✅ Polished: Safety Info as a NavigationLink (instead of a sheet)
-                    NavigationLink {
-                        SafetyInfoView()
-                    } label: {
-                        Label("Safety Info", systemImage: "info.circle")
-                            .foregroundColor(.secondary)
-                    }
-
-                    Spacer()
+                if cameraGranted {
+                    EmbeddedCameraPreview(model: embeddedCamera)
+                        .ignoresSafeArea()
+                } else {
+                    AppTheme.background
+                        .ignoresSafeArea()
+                        .allowsHitTesting(false)
                 }
+
+                LinearGradient(
+                    colors: [
+                        Color.black.opacity(cameraGranted ? 0.55 : 0.0),
+                        Color.black.opacity(cameraGranted ? 0.25 : 0.0),
+                        Color.black.opacity(cameraGranted ? 0.55 : 0.0)
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+                .allowsHitTesting(false)
+
+                VStack(spacing: 18) {
+
+                    VStack(spacing: 6) {
+                        
+                        Text("Capture a photo to assess pouch cell condition.")
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundColor(cameraGranted ? .white.opacity(0.85) : .secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 24)
+                    }
+                    .padding(.top, 22)
+
+                    Spacer()
+
+                    if !cameraGranted {
+                        VStack(spacing: 12) {
+                            Text("Camera disabled.")
+                            Text("Camera access is required to scan a battery.")
+                                .font(.system(size: 16, weight: .semibold))
+                                .multilineTextAlignment(.center)
+
+                            Button {
+                                Task { await requestCameraPermissionAndStart(silentIfDenied: false) }
+                            } label: {
+                                Label("Open Settings", systemImage: "camera.fill")
+                                    .font(.system(size: 18, weight: .semibold))
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 16)
+                                    .background(AppTheme.accent)
+                                    .cornerRadius(16)
+                            }
+
+                            Button {
+                                Task {
+                                    let granted = await photoPermissionManager.requestPermissionAsync()
+                                    if granted { showUIKitPicker = true }
+                                }
+                            } label: {
+                                Label("Import from Library", systemImage: "photo.on.rectangle")
+                                    .font(.system(size: 17, weight: .medium))
+                                    .foregroundColor(AppTheme.accent)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 14)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 16)
+                                            .stroke(AppTheme.accent, lineWidth: 2)
+                                    )
+                            }
+                        }
+                        .padding(.horizontal, 28)
+                        .padding(.vertical, 18)
+                        .background(.ultraThinMaterial)
+                        .cornerRadius(20)
+                        .padding(.horizontal, 24)
+
+                    } else {
+
+                        HStack(spacing: 28) {
+
+                            Button {
+                                embeddedCamera.toggleFlash()
+                            } label: {
+                                Image(systemName: embeddedCamera.isTorchOn ? "bolt.fill" : "bolt.slash.fill")
+                                    .font(.system(size: 22, weight: .semibold))
+                                    .foregroundColor(.white)
+                                    .frame(width: 54, height: 54)
+                                    .background(.ultraThinMaterial)
+                                    .clipShape(Circle())
+                            }
+                            .accessibilityLabel(embeddedCamera.isTorchOn ? "Flash on" : "Flash off")
+                            .accessibilityHint("Double tap to toggle the camera flash.")
+
+                            Button {
+                                embeddedCamera.capture()
+                            } label: {
+                                ZStack {
+                                    Circle()
+                                        .fill(Color.white)
+                                        .frame(width: 74, height: 74)
+
+                                    Circle()
+                                        .stroke(Color.black.opacity(0.25), lineWidth: 2)
+                                        .frame(width: 74, height: 74)
+                                }
+                            }
+                            .accessibilityLabel("Take picture")
+                            .accessibilityHint("Double tap to take a picture of a lithium pouch cell battery.")
+                            .popoverTip(SpeechFeedbackTip())
+
+                            Button {
+                                Task {
+                                    let granted = await photoPermissionManager.requestPermissionAsync()
+                                    if granted { showUIKitPicker = true }
+                                }
+                            } label: {
+                                Image(systemName: "photo.on.rectangle")
+                                    .font(.system(size: 22, weight: .semibold))
+                                    .foregroundColor(.white)
+                                    .frame(width: 54, height: 54)
+                                    .background(.ultraThinMaterial)
+                                    .clipShape(Circle())
+                            }
+                            .accessibilityLabel("Import from library")
+                            .accessibilityHint("Choose an image of a lithium pouch cell battery from your library and get a result.")
+                        }
+                        .padding(.bottom, 8)
+
+                        NavigationLink {
+                            SafetyInfoView()
+                        } label: {
+                            Label("Safety Info", systemImage: "info.circle")
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundColor(.white.opacity(0.9))
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 10)
+                                .background(.ultraThinMaterial)
+                                .cornerRadius(14)
+                        }
+                        .padding(.bottom, 26)
+                    }
+                }
+                .padding(.bottom, 10)
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button { showMenu = true } label: {
                         Image(systemName: "line.3.horizontal")
+                            .foregroundColor(cameraGranted ? .white : .primary)
                             .accessibilityLabel("Menu")
                     }
                 }
+            }
+            .onAppear {
+                embeddedCamera.onCapture = { image in
+                    capturedImage = image
+
+                    // ✅ Save to Photos only for camera scans (not imports)
+                    if saveToPhotos {
+                        Task { await saveScanToPhotosIfAllowed(image) }
+                    }
+
+                    runClassification()
+                }
+
+                Task { await requestCameraPermissionAndStart(silentIfDenied: true) }
+            }
+            .onChange(of: cameraGranted) { _, granted in
+                if granted {
+                    embeddedCamera.startSessionIfNeeded()
+                } else {
+                    embeddedCamera.stopSessionIfNeeded()
+                }
+            }
+            .onChange(of: scenePhase) {
+                guard scenePhase == .active else { return }
+
+                cameraManager.refreshStatus()
+                photoPermissionManager.refreshStatus()
+
+                if cameraManager.permissionGranted && !cameraGranted {
+                    cameraGranted = true
+                    embeddedCamera.startSessionIfNeeded()
+                }
+
+                if !cameraManager.permissionGranted && cameraGranted {
+                    cameraGranted = false
+                    embeddedCamera.stopSessionIfNeeded()
+                }
+            }
+            .onDisappear {
+                embeddedCamera.stopSessionIfNeeded()
             }
         }
         .task { try? Tips.configure() }
 
         .sheet(isPresented: $showMenu) {
             MenuView()
-        }
-
-        .sheet(isPresented: $showCamera) {
-            CameraView { image in
-                capturedImage = image
-                runClassification()
-            }
         }
 
         .sheet(isPresented: $showUIKitPicker) {
@@ -135,18 +265,94 @@ struct HomeScreen: View {
         .sheet(item: $resultPayload) { payload in
             DetectionResultScreen(
                 result: payload.result,
-                scannedImage: payload.image,
-                onScanAgain: {
-                    Task {
-                        let granted = await cameraManager.requestPermissionAsync()
-                        if granted { showCamera = true }
-                    }
-                }
+                scannedImage: payload.image
             )
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
+                }
+        .alert("Photo Access Required", isPresented: $photoPermissionManager.showPermissionAlert) {
+            Button("Open Settings") { photoPermissionManager.openSettings() }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("Please enable photo access in Settings to import an image.")
+        }
+
+        // ✅ Save-to-Photos alert (only shown if user enabled saving, but iOS blocks saving)
+        .alert("Can’t Save to Photos", isPresented: $showSaveToPhotosAlert) {
+            Button("Open Settings") { openAppSettings() }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("To save scans to your Photos library, allow Photos access in Settings.")
         }
     }
+
+    // MARK: - Permissions
+
+    private func requestCameraPermissionAndStart(silentIfDenied: Bool) async {
+        let status = cameraManager.currentStatus()
+
+        if status == .denied || status == .restricted {
+            await MainActor.run { self.cameraGranted = false }
+            if !silentIfDenied {
+                await MainActor.run { cameraManager.openSettings() }
+            }
+            return
+        }
+
+        let granted = await cameraManager.requestPermissionAsync()
+        await MainActor.run { self.cameraGranted = granted }
+
+        if granted {
+            embeddedCamera.startSessionIfNeeded()
+        }
+    }
+
+    // MARK: - Save to Photos
+
+    private func saveScanToPhotosIfAllowed(_ image: UIImage) async {
+        // Use add-only authorization for saving
+        let status = PHPhotoLibrary.authorizationStatus(for: .addOnly)
+
+        if status == .authorized {
+            await createPhotoAsset(image)
+            return
+        }
+
+        if status == .denied || status == .restricted {
+            await MainActor.run { showSaveToPhotosAlert = true }
+            return
+        }
+
+        // .notDetermined -> request add-only
+        let granted = await withCheckedContinuation { continuation in
+            PHPhotoLibrary.requestAuthorization(for: .addOnly) { newStatus in
+                continuation.resume(returning: newStatus == .authorized)
+            }
+        }
+
+        if granted {
+            await createPhotoAsset(image)
+        } else {
+            await MainActor.run { showSaveToPhotosAlert = true }
+        }
+    }
+
+    private func createPhotoAsset(_ image: UIImage) async {
+        await withCheckedContinuation { continuation in
+            PHPhotoLibrary.shared().performChanges({
+                PHAssetChangeRequest.creationRequestForAsset(from: image)
+            }) { _, _ in
+                continuation.resume()
+            }
+        }
+    }
+
+    private func openAppSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        UIApplication.shared.open(url)
+    }
+
+    // MARK: - Classification
 
     private func runClassification() {
         guard let image = capturedImage else { return }
