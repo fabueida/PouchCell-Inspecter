@@ -64,7 +64,7 @@ struct SafetyTipContent {
     let whatToDoNow: [String]
     let prevention: [String]
     let whenToEscalate: [String]
-
+    
     static func forCondition(_ condition: BatteryCondition) -> SafetyTipContent {
         switch condition {
         case .normal:
@@ -88,7 +88,6 @@ struct SafetyTipContent {
                     "If the pouch begins to expand, treat it as bulging and follow the bulging guidance."
                 ]
             )
-
         case .bulging:
             return SafetyTipContent(
                 title: "Safety tips for: Bulging",
@@ -143,8 +142,7 @@ struct DetectionResultScreen: View {
     // ✅ NEW: scanned/imported image
     let scannedImage: UIImage?
 
-    let onScanAgain: () -> Void
-
+    
     @Environment(\.dismiss) private var dismiss
     @State private var showSafetyTips = false
 
@@ -152,15 +150,13 @@ struct DetectionResultScreen: View {
     @EnvironmentObject private var speechStore: SpeechSettingsStore
     @State private var didSpeakResult = false
 
+    // Haptics (disabled by default; user can enable in Menu)
+    @AppStorage("pref_haptics") private var hapticsEnabled: Bool = false
+    @State private var didPlayHaptic = false
+
     private var condition: BatteryCondition { BatteryCondition(from: result) }
 
-    init(result: String, scannedImage: UIImage? = nil, onScanAgain: @escaping () -> Void) {
-        self.result = result
-        self.scannedImage = scannedImage
-        self.onScanAgain = onScanAgain
-    }
-
-    var body: some View {
+            var body: some View {
         NavigationStack {
             ZStack {
                 // Background (same as other screens)
@@ -216,26 +212,12 @@ struct DetectionResultScreen: View {
 
                     // Buttons
                     VStack(spacing: 20) {
-                        Button {
-                            dismiss()
-                            DispatchQueue.main.async {
-                                onScanAgain()
-                            }
-                        } label: {
-                            Text("Scan Again")
-                                .font(.system(size: 20, weight: .medium))
-                                .foregroundColor(.black)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
-                                .background(Color(red: 0.73, green: 0.81, blue: 0.86))
-                                .cornerRadius(14)
-                        }
-                        .padding(.horizontal, 60)
-
+                        
                         Button {
                             showSafetyTips = true
                         } label: {
                             Text("View Safety Tips")
+                                .accessibilityHint("Shows an overview on what to do depending on clasification result.")
                                 .font(.system(size: 20, weight: .medium))
                                 .foregroundColor(.black)
                                 .frame(maxWidth: .infinity)
@@ -262,6 +244,9 @@ struct DetectionResultScreen: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                     SpeechManager.shared.speak(phrase, settings: speechStore.settings)
                 }
+
+                // Haptic feedback once when the result appears.
+                playResultHapticsIfNeeded()
             }
             .onDisappear {
                 // Avoid lingering speech if the user dismisses quickly.
@@ -282,6 +267,41 @@ struct DetectionResultScreen: View {
                 SafetyTipsSheet(content: SafetyTipContent.forCondition(condition))
                     .presentationDetents([.medium, .large])
                     .presentationDragIndicator(.visible)
+            }
+        }
+    }
+
+    // MARK: - Haptics
+
+    private func playResultHapticsIfNeeded() {
+        guard hapticsEnabled, !didPlayHaptic else { return }
+        didPlayHaptic = true
+
+        // Small delay so it fires after the view fully presents.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            switch condition {
+            case .normal:
+                let gen = UINotificationFeedbackGenerator()
+                gen.prepare()
+                gen.notificationOccurred(.success)
+
+            case .bulging:
+                // Stronger + distinct “alert” feeling
+                let note = UINotificationFeedbackGenerator()
+                note.prepare()
+                note.notificationOccurred(.warning)
+
+                // Follow-up impact to make it feel more urgent.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
+                    let impact = UIImpactFeedbackGenerator(style: .heavy)
+                    impact.prepare()
+                    impact.impactOccurred()
+                }
+
+            case .unknown:
+                let note = UINotificationFeedbackGenerator()
+                note.prepare()
+                note.notificationOccurred(.warning)
             }
         }
     }
@@ -340,7 +360,7 @@ struct SafetyTipsSheet: View {
 
 struct DetectionResultScreen_Previews: PreviewProvider {
     static var previews: some View {
-        DetectionResultScreen(result: "Normal", scannedImage: nil, onScanAgain: {})
+        DetectionResultScreen(result: "Normal", scannedImage: nil)
             .environmentObject(SpeechSettingsStore.shared)
     }
 }
