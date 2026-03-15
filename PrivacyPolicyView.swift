@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct PrivacyPolicyView: View {
+    private let privacyPolicyURL = URL(string: "https://github.com/fabueida/PouchCellInspector-PrivacyPolicy")!
+    private let emailURL = URL(string: "mailto:pouchcellinspector@gmail.com")!
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
@@ -28,9 +31,15 @@ struct PrivacyPolicyView: View {
                 .font(.title2.bold())
                 .foregroundStyle(.primary)
 
-            Text("Last updated, March 8, 2026")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Last updated,")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+
+                Text("March 10, 2026")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
 
             Text("""
 This Privacy Policy for Pouch Cell Inspecter, conducted as part of a research project at the University of Michigan Dearborn, describes how and why we may access, process, and store information when you use our application (“Services”).
@@ -58,12 +67,16 @@ Pouch Cell Inspecter is designed to keep your data private. At this time, the ap
             .font(.body)
             .foregroundStyle(.primary)
 
-            Text("""
-Questions or concerns? Reading this Privacy Policy will help you understand what information may be used by the app, how it is handled, and what choices you have through the app and iOS settings. For further questions or concerns, please feel free to email us at
-pouchcell26@gmail.com.
+            VStack(alignment: .leading, spacing: 4) {
+                Text("""
+Questions or concerns? Reading this Privacy Policy will help you understand what information may be used by the app, how it is handled, and what choices you have through the app and iOS settings. For further questions or concerns, please feel free to email us at:
 """)
-            .font(.body)
-            .foregroundStyle(.primary)
+                .font(.body)
+                .foregroundStyle(.primary)
+
+                Link("pouchcellinspector@gmail.com", destination: emailURL)
+                    .font(.body)
+            }
         }
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -105,6 +118,7 @@ We do not sell your data or use the app’s core inspection features for adverti
 
     private var fullPolicyCard: some View {
         VStack(alignment: .leading, spacing: 22) {
+
             policySection(
                 title: "What information do we process?",
                 body: """
@@ -113,7 +127,7 @@ When you use Pouch Cell Inspecter, the app may process information such as image
 These preferences may include speech settings, appearance settings, haptic feedback settings, and whether captured images should be saved to your Photos library.
 """
             )
-            
+
             policySection(
                 title: "How do we process your information?",
                 body: """
@@ -122,7 +136,7 @@ Pouch Cell Inspecter is designed so that core inspection-related processing happ
 At this time, the app does not rely on cloud storage for core functionality. This means inspection images and related results are intended to remain on-device unless you deliberately choose to save or share them using features provided by your device.
 """
             )
-            
+
             policySection(
                 title: "Do we collect or store personal data remotely?",
                 body: """
@@ -131,7 +145,7 @@ At this time, Pouch Cell Inspecter does not use remote cloud storage for the app
 App settings and preferences are stored locally on your device so the app can remember how you want it to behave.
 """
             )
-            
+
             policySection(
                 title: "Camera and Photos access",
                 body: """
@@ -140,7 +154,7 @@ The app may request access to your camera so that you can inspect pouch cells us
 If you enable the “Save to Photos” setting, captured images may be saved to your Photos library on your device. If that setting remains off, the app will not automatically save captured images to Photos.
 """
             )
-            
+
             policySection(
                 title: "Accessibility features",
                 body: """
@@ -149,7 +163,7 @@ Pouch Cell Inspecter includes optional accessibility-related features, such as s
 If enabled, these features use capabilities available on your device. Your accessibility-related preferences are stored locally so they persist between app launches.
 """
             )
-            
+
             policySection(
                 title: "Data sharing",
                 body: """
@@ -158,7 +172,7 @@ We do not sell, rent, or use your inspection-related information for advertising
 Because the app is designed around local on-device functionality, we aim to minimize unnecessary collection and sharing of user data.
 """
             )
-            
+
             policySection(
                 title: "Your choices",
                 body: """
@@ -167,24 +181,32 @@ You can control important privacy-related behaviors through the app and through 
 You may review or change permissions for Pouch Cell Inspecter at any time through your device settings.
 """
             )
-            
+
             policySection(
                 title: "Changes to this Privacy Policy",
                 body: """
 We may update this Privacy Policy from time to time to reflect changes to the app, its features, or legal requirements. When we do, we will revise the “Last updated” date shown at the top of this screen.
 """
             )
-            
-            policySection(
-                title: "Contact and feedback",
-                body: """
-If you have any questions or concerns about this Privacy Policy or the privacy practices of Pouch Cell Inspecter, you may contact us at:
-pouchcell26@gmail.com
-"""
-            )
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Contact and feedback")
+                    .font(.headline)
+
+                Text("If you have any questions or concerns about this Privacy Policy or the privacy practices of Pouch Cell Inspecter, you may contact us at:")
+                    .font(.body)
+
+                Link("pouchcellinspector@gmail.com", destination: emailURL)
+                    .font(.body)
+
+                Text("Or, if you'd like to read it in full:")
+                    .font(.body)
+
+                Link("Read our privacy policy online", destination: privacyPolicyURL)
+                    .font(.body)
+            }
         }
-        
-                .padding(20)
+        .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
@@ -218,4 +240,5 @@ pouchcell26@gmail.com
         PrivacyPolicyView()
     }
 }
+
 
