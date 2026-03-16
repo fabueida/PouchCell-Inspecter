@@ -19,6 +19,7 @@
 		888364702F200CAA00CB5773 /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8883646F2F200CAA00CB5773 /* MenuView.swift */; };
 		88ACF8872F2AB78400C00B33 /* OnboardingContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88ACF8862F2AB78400C00B33 /* OnboardingContainerView.swift */; };
 		88ACF8892F2AB95F00C00B33 /* OnboardingPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88ACF8882F2AB95F00C00B33 /* OnboardingPageView.swift */; };
+		88B3FBF52F67DF7B008F0929 /* VoiceSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B3FBF42F67DF7B008F0929 /* VoiceSelectionView.swift */; };
 		88B6C9892F2964A300AEC090 /* PhotoPermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B6C9882F2964A300AEC090 /* PhotoPermissionManager.swift */; };
 		88B6C98B2F29651E00AEC090 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88B6C98A2F29651E00AEC090 /* ImagePicker.swift */; };
 		88C0A4112F66072700CE97CB /* EmbeddedCameraPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88C0A4102F66072700CE97CB /* EmbeddedCameraPreview.swift */; };
@@ -50,6 +51,7 @@
 		888AF1352ED64B9500EB16CC /* PouchCellInspecter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PouchCellInspecter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		88ACF8862F2AB78400C00B33 /* OnboardingContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingContainerView.swift; sourceTree = "<group>"; };
 		88ACF8882F2AB95F00C00B33 /* OnboardingPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPageView.swift; sourceTree = "<group>"; };
+		88B3FBF42F67DF7B008F0929 /* VoiceSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceSelectionView.swift; sourceTree = "<group>"; };
 		88B6C9882F2964A300AEC090 /* PhotoPermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPermissionManager.swift; sourceTree = "<group>"; };
 		88B6C98A2F29651E00AEC090 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		88C0A4102F66072700CE97CB /* EmbeddedCameraPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddedCameraPreview.swift; sourceTree = "<group>"; };
@@ -119,6 +121,7 @@
 				88B6C9882F2964A300AEC090 /* PhotoPermissionManager.swift */,
 				88B6C98A2F29651E00AEC090 /* ImagePicker.swift */,
 				8883646F2F200CAA00CB5773 /* MenuView.swift */,
+				88B3FBF42F67DF7B008F0929 /* VoiceSelectionView.swift */,
 				88811E962F660A7A00662F0E /* PrivacyPolicyView.swift */,
 				8846F77C2F2407BA0011F803 /* SpeechManager.swift */,
 				88811E362F6609F600662F0E /* AboutScreen.swift */,
@@ -258,6 +261,7 @@
 				88811CBD2F66083C00662F0E /* SpeechSettingsStore.swift in Sources */,
 				88C0A4112F66072700CE97CB /* EmbeddedCameraPreview.swift in Sources */,
 				880BCC502EEDF9F900089BB3 /* AppTheme.swift in Sources */,
+				88B3FBF52F67DF7B008F0929 /* VoiceSelectionView.swift in Sources */,
 				88811E972F660A7A00662F0E /* PrivacyPolicyView.swift in Sources */,
 				8846F77D2F2407BA0011F803 /* SpeechManager.swift in Sources */,
 				88811E372F6609F600662F0E /* AboutScreen.swift in Sources */,

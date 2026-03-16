@@ -30,15 +30,17 @@ struct MenuView: View {
 
     private let supportEmail = "pouchcellinspector@gmail.com"
     private let supportSubject = "PouchCellInspecter – Support / Feedback"
-    
-    private var availableVoices: [AVSpeechSynthesisVoice] {
-        AVSpeechSynthesisVoice.speechVoices().sorted { (lhs, rhs) in
-            (lhs.language, lhs.name) < (rhs.language, rhs.name)
-        }
-    }
 
     private var effectiveScheme: ColorScheme? {
         theme.appearance == .system ? systemScheme : theme.appearance.colorScheme
+    }
+
+    private var selectedVoiceName: String {
+        guard let identifier = speechStore.settings.voiceIdentifier,
+              let voice = AVSpeechSynthesisVoice(identifier: identifier) else {
+            return "System Default"
+        }
+        return voice.name
     }
 
     var body: some View {
@@ -57,9 +59,14 @@ struct MenuView: View {
                     ))
 
                     Text("The app can automatically read out the scan result after analysis.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
 
                     Toggle("Enable Haptics", isOn: $haptics)
+
                     Text("The app can use haptic feedback on the results screen (e.g., a stronger alert for bulging).")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
 
                     if speechStore.settings.isEnabled {
                         VStack(alignment: .leading, spacing: 12) {
@@ -105,19 +112,16 @@ struct MenuView: View {
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
 
-                                Picker("Voice", selection: Binding(
-                                    get: { speechStore.settings.voiceIdentifier ?? "" },
-                                    set: { newValue in
-                                        var s = speechStore.settings
-                                        s.voiceIdentifier = newValue.isEmpty ? nil : newValue
-                                        speechStore.settings = s
-                                    }
-                                )) {
-                                    Text("System default").tag("")
-
-                                    ForEach(availableVoices, id: \.identifier) { voice in
-                                        Text("\(voice.name) (\(voice.language))")
-                                            .tag(voice.identifier)
+                                NavigationLink {
+                                    VoiceSelectionView()
+                                        .environmentObject(speechStore)
+                                } label: {
+                                    HStack {
+                                        Text("Voice")
+                                        Spacer()
+                                        Text(selectedVoiceName)
+                                            .foregroundStyle(.secondary)
+                                            .lineLimit(1)
                                     }
                                 }
                             }
@@ -135,7 +139,10 @@ struct MenuView: View {
 
                 Section("Capture") {
                     Toggle("Save to Photos", isOn: $saveToPhotos)
+
                     Text("Automatically save pictures you've scanned using your iPhone's camera.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                 }
 
                 Section("Appearance") {
@@ -166,13 +173,14 @@ struct MenuView: View {
                         Label("Learn more about Pouch Cell Inspector", systemImage: "book")
                     }
                 }
+
                 NavigationLink {
                     PrivacyPolicyView()
                 } label: {
                     Label("Read our Privacy Policy", systemImage: "hand.raised")
                 }
-                                                    
-                                Section {
+
+                Section {
                     HStack {
                         Text("App Version")
                         Spacer()
@@ -192,8 +200,7 @@ struct MenuView: View {
             .sheet(isPresented: $showingMailComposer) {
                 MailComposerView(
                     recipients: [supportEmail],
-                    subject: supportSubject,
-                    //body: supportBody
+                    subject: supportSubject
                 )
             }
             .alert("Mail not available", isPresented: $showingMailUnavailableAlert) {
@@ -229,14 +236,14 @@ struct MenuView: View {
 struct MailComposerView: UIViewControllerRepresentable {
     let recipients: [String]
     let subject: String
-    
+
     @Environment(\.dismiss) private var dismiss
 
     func makeUIViewController(context: Context) -> MFMailComposeViewController {
         let vc = MFMailComposeViewController()
         vc.setToRecipients(recipients)
         vc.setSubject(subject)
-                    vc.mailComposeDelegate = context.coordinator
+        vc.mailComposeDelegate = context.coordinator
         return vc
     }
 
@@ -253,9 +260,11 @@ struct MailComposerView: UIViewControllerRepresentable {
             self.dismiss = dismiss
         }
 
-        func mailComposeController(_ controller: MFMailComposeViewController,
-                                  didFinishWith result: MFMailComposeResult,
-                                  error: Error?) {
+        func mailComposeController(
+            _ controller: MFMailComposeViewController,
+            didFinishWith result: MFMailComposeResult,
+            error: Error?
+        ) {
             dismiss()
         }
     }
@@ -266,4 +275,3 @@ struct MailComposerView: UIViewControllerRepresentable {
         .environmentObject(SpeechSettingsStore.shared)
         .environmentObject(ThemeManager.shared)
 }
-
