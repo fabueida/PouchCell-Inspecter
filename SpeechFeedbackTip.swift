@@ -15,7 +15,7 @@ struct SpeechFeedbackTip: Tip {
     }
 
     var message: Text? {
-        Text("Turn on spoken battery results in Settings for better accessibility and hands-free use.")
+        Text("Turn on spoken battery results in Settings for better accessibility and hands-free use. You can also enable haptic feedback to feel different classification results without looking at the screen.")
     }
 
     var image: Image? {

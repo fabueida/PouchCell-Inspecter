@@ -2,64 +2,50 @@
 //  MenuView.swift
 //  PouchCellInspecter
 //
-//  Created by Firas Abueida on 1/20/26.
+//  Created by Firas Abueida on 11/25/25.
 //
 
 import SwiftUI
 import AVFoundation
-
-enum AppAppearance: String, CaseIterable, Identifiable {
-    case system
-    case light
-    case dark
-
-    var id: String { rawValue }
-
-    var title: String {
-        switch self {
-        case .system: return "System"
-        case .light: return "Light"
-        case .dark: return "Dark"
-        }
-    }
-
-    var colorScheme: ColorScheme? {
-        switch self {
-        case .system: return nil
-        case .light: return .light
-        case .dark: return .dark
-        }
-    }
-}
+import MessageUI
+import UIKit
 
 struct MenuView: View {
 
     @Environment(\.dismiss) private var dismiss
-
-    // Shared speech settings used by the whole app
     @EnvironmentObject private var speechStore: SpeechSettingsStore
+    @EnvironmentObject private var theme: ThemeManager
+    @Environment(\.colorScheme) private var systemScheme
 
-    @AppStorage("appAppearance") private var appearance: AppAppearance = .system
+    @State private var showingMailComposer = false
+    @State private var showingMailUnavailableAlert = false
 
-    private var availableVoices: [AVSpeechSynthesisVoice] {
-        AVSpeechSynthesisVoice.speechVoices().sorted { (lhs, rhs) in
-            (lhs.language, lhs.name) < (rhs.language, rhs.name)
+    @AppStorage("pref_showGrid") private var showGrid: Bool = true
+
+    // ✅ Privacy-friendly: OFF by default
+    @AppStorage("pref_saveToPhotos") private var saveToPhotos: Bool = false
+
+    // ✅ Haptics are OFF by default on first install (opt-in).
+    @AppStorage("pref_haptics") private var haptics: Bool = false
+
+    private let supportEmail = "pouchcellinspector@gmail.com"
+    private let supportSubject = "PouchCellInspecter – Support / Feedback"
+
+    private var effectiveScheme: ColorScheme? {
+        theme.appearance == .system ? systemScheme : theme.appearance.colorScheme
+    }
+
+    private var selectedVoiceName: String {
+        guard let identifier = speechStore.settings.voiceIdentifier,
+              let voice = AVSpeechSynthesisVoice(identifier: identifier) else {
+            return "System Default"
         }
+        return voice.name
     }
 
     var body: some View {
         NavigationStack {
             List {
-
-                Section("Safety") {
-                    NavigationLink("Battery inspection disclaimer") {
-                        InfoDetailView(
-                            title: "Safety Disclaimer",
-                            message: "This app provides a visual inspection only and does not replace professional battery testing or safety procedures."
-                        )
-                    }
-                }
-
                 Section("Accessibility") {
                     Toggle("Speak results after scan", isOn: Binding(
                         get: { speechStore.settings.isEnabled },
@@ -68,13 +54,19 @@ struct MenuView: View {
                             s.isEnabled = newValue
                             speechStore.settings = s
 
-                            if !newValue {
-                                SpeechManager.shared.stop()
-                            }
+                            if !newValue { SpeechManager.shared.stop() }
                         }
                     ))
 
                     Text("The app can automatically read out the scan result after analysis.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+
+                    Toggle("Enable Haptics", isOn: $haptics)
+
+                    Text("The app can use haptic feedback on the results screen (e.g., a stronger alert for bulging).")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
 
                     if speechStore.settings.isEnabled {
                         VStack(alignment: .leading, spacing: 12) {
@@ -120,19 +112,16 @@ struct MenuView: View {
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
 
-                                Picker("Voice", selection: Binding(
-                                    get: { speechStore.settings.voiceIdentifier ?? "" },
-                                    set: { newValue in
-                                        var s = speechStore.settings
-                                        s.voiceIdentifier = newValue.isEmpty ? nil : newValue
-                                        speechStore.settings = s
-                                    }
-                                )) {
-                                    Text("System default").tag("")
-
-                                    ForEach(availableVoices, id: \.identifier) { voice in
-                                        Text("\(voice.name) (\(voice.language))")
-                                            .tag(voice.identifier)
+                                NavigationLink {
+                                    VoiceSelectionView()
+                                        .environmentObject(speechStore)
+                                } label: {
+                                    HStack {
+                                        Text("Voice")
+                                        Spacer()
+                                        Text(selectedVoiceName)
+                                            .foregroundStyle(.secondary)
+                                            .lineLimit(1)
                                     }
                                 }
                             }
@@ -148,80 +137,141 @@ struct MenuView: View {
                     }
                 }
 
+                Section("Capture") {
+                    Toggle("Save to Photos", isOn: $saveToPhotos)
+
+                    Text("Automatically save pictures you've scanned using your iPhone's camera.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+
                 Section("Appearance") {
-                    Picker("App appearance", selection: $appearance) {
+                    Picker("App appearance", selection: $theme.appearance) {
                         ForEach(AppAppearance.allCases) { option in
                             Text(option.title).tag(option)
                         }
                     }
+                    .onChange(of: theme.appearance) { _, _ in
+                        theme.apply()
+                    }
+                }
+
+                Section("Support") {
+                    Button { openContactUs() } label: {
+                        Label("Contact us", systemImage: "envelope")
+                    }
+
+                    Button { openAppSettings() } label: {
+                        Label("Open iOS Settings", systemImage: "gearshape")
+                    }
                 }
 
                 Section("About") {
-                    if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
-                        HStack {
-                            Text("App Version")
-                            Spacer()
-                            Text(version)
-                                .foregroundColor(.secondary)
-                        }
+                    NavigationLink {
+                        AboutScreen()
+                    } label: {
+                        Label("Learn more about Pouch Cell Inspector", systemImage: "book")
                     }
+                }
 
-                    NavigationLink("Contact & feedback") {
-                        InfoDetailView(
-                            title: "Contact & Feedback",
-                            message: "For feedback or support, please contact our development team."
-                        )
+                NavigationLink {
+                    PrivacyPolicyView()
+                } label: {
+                    Label("Read our Privacy Policy", systemImage: "hand.raised")
+                }
+
+                Section {
+                    HStack {
+                        Text("App Version")
+                        Spacer()
+                        Text(appVersionString)
+                            .foregroundColor(.secondary)
                     }
                 }
             }
-            .navigationTitle("Menu")
+            .listStyle(.insetGrouped)
+            .navigationTitle("Settings")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Close") { dismiss() }
                 }
             }
+            .preferredColorScheme(effectiveScheme)
+            .sheet(isPresented: $showingMailComposer) {
+                MailComposerView(
+                    recipients: [supportEmail],
+                    subject: supportSubject
+                )
+            }
+            .alert("Mail not available", isPresented: $showingMailUnavailableAlert) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("Please set up Mail on this device to send email from within the app.")
+            }
         }
     }
 
-    // MARK: - On-device reliability helper
-
-    private func speakWithAudioSession(_ text: String, settings: SpeechSettings) {
-        // Configure audio session here to avoid "works in simulator, not on phone" issues.
-        let session = AVAudioSession.sharedInstance()
-        do {
-            try session.setCategory(.playback, mode: .spokenAudio, options: [.duckOthers])
-            try session.setActive(true)
-        } catch {
-            // If this fails, still try speaking.
+    private func openContactUs() {
+        if MFMailComposeViewController.canSendMail() {
+            showingMailComposer = true
+        } else {
+            showingMailUnavailableAlert = true
         }
+    }
 
-        SpeechManager.shared.speak(text, settings: settings)
+    private func openAppSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        UIApplication.shared.open(url)
+    }
+
+    private var appVersionString: String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—"
+        return "\(version) (\(build))"
     }
 }
 
-struct InfoDetailView: View {
-    let title: String
-    let message: String
+// MARK: - In-app Mail Composer
 
-    var body: some View {
-        VStack(spacing: 24) {
-            Image(systemName: "info.circle.fill")
-                .font(.system(size: 48))
-                .foregroundColor(.accentColor)
+struct MailComposerView: UIViewControllerRepresentable {
+    let recipients: [String]
+    let subject: String
 
-            Text(message)
-                .font(.body)
-                .multilineTextAlignment(.center)
-                .foregroundColor(.secondary)
+    @Environment(\.dismiss) private var dismiss
+
+    func makeUIViewController(context: Context) -> MFMailComposeViewController {
+        let vc = MFMailComposeViewController()
+        vc.setToRecipients(recipients)
+        vc.setSubject(subject)
+        vc.mailComposeDelegate = context.coordinator
+        return vc
+    }
+
+    func updateUIViewController(_ uiViewController: MFMailComposeViewController, context: Context) { }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(dismiss: dismiss)
+    }
+
+    final class Coordinator: NSObject, MFMailComposeViewControllerDelegate {
+        let dismiss: DismissAction
+
+        init(dismiss: DismissAction) {
+            self.dismiss = dismiss
         }
-        .padding()
-        .navigationTitle(title)
+
+        func mailComposeController(
+            _ controller: MFMailComposeViewController,
+            didFinishWith result: MFMailComposeResult,
+            error: Error?
+        ) {
+            dismiss()
+        }
     }
 }
 
 #Preview {
     MenuView()
         .environmentObject(SpeechSettingsStore.shared)
+        .environmentObject(ThemeManager.shared)
 }
-
-
