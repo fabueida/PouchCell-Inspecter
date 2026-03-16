@@ -32,12 +32,11 @@ struct PrivacyPolicyView: View {
                 .foregroundStyle(.primary)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text("Last updated,")
+                Text("Last updated, March 10, 2026")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
 
-                Text("March 10, 2026")
-                    .font(.subheadline)
+                                    .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
 

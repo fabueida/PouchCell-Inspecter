@@ -182,7 +182,7 @@ struct MenuView: View {
                 }
             }
             .listStyle(.insetGrouped)
-            .navigationTitle("Menu")
+            .navigationTitle("Settings")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Close") { dismiss() }
