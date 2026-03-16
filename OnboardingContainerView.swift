@@ -36,6 +36,7 @@ struct OnboardingContainerView: View {
                     features: [
                         "Take a photo of the battery",
                         "We analyze its condition",
+                        "Classification results are returned within seconds",
                         "Save images and view past results"
                     ]
                 )
