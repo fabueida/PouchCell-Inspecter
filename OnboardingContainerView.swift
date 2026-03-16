@@ -21,7 +21,7 @@ struct OnboardingContainerView: View {
 
             TabView(selection: $currentPage) {
                 OnboardingPageView(
-                    imageName: "onboardingIcon",
+                    imageName: "OnboardingIcon",
                     welcomeText: "Welcome to Pouch Cell Inspector!",
                     title: "Know Your Battery’s Condition Instantly",
                     subtitle: "Check if a lithium-ion pouch battery is safe in seconds.",
@@ -30,7 +30,7 @@ struct OnboardingContainerView: View {
                 .tag(0)
 
                 OnboardingPageView(
-                    imageName: "onboardingIcon",
+                    imageName: "OnboardingIcon",
                     title: "How It Works",
                     subtitle: "",
                     features: [
@@ -65,7 +65,7 @@ struct OnboardingContainerView: View {
     private var header: some View {
         HStack(spacing: 12) {
             // Polished "app icon" treatment for the header
-            Image("PouchCellIcon")
+            Image("OnboardingIcon")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 30, height: 30)
