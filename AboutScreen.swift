@@ -19,9 +19,9 @@ struct AboutScreen: View {
                     title: "Quick start (Home Screen)",
                     systemImage: "house.fill",
                     bullets: [
-                        "Tap Take picture to capture a photo and scan.",
-                                                "Or tap Import from library to scan a saved image.",
-                        "You can use either option even if you don’t have a pouch cell in front of you (sample images work too)."
+                        "Tap Take picture to capture a photo and scan (the large center capture button).",
+                        "Or tap Import from library to scan a saved image.",
+                        "You can use either option even if you don’t have a pouch cell in front of you (sample images and online images work too)."
                     ]
                 )
 
@@ -30,7 +30,7 @@ struct AboutScreen: View {
                     systemImage: "camera.fill",
                     bullets: [
                         "From the Home Screen, tap Take picture (the large center capture button).",
-                        "Point at the pouch cell (or any online reference image you want to test).",
+                        "Point at the pouch cell, or point at an image shown on another device.",
                         "Keep it centered and in focus, then capture the photo.",
                         "You’ll get a result within seconds."
                     ]
@@ -42,8 +42,8 @@ struct AboutScreen: View {
                     bullets: [
                         "From the Home Screen, tap Import from library (photo icon).",
                         "Pick an image from Photos and the app will scan it right away.",
-                        "To use an image from online: save it to Photos or take a screenshot, then import it here.",
-                        "This is great for testing or scanning images shared by someone else."
+                        "To use an image from online: save it to Photos or take a screenshot first, then import it here.",
+                        "This is great for testing, scanning reference images, or scanning images shared by someone else."
                     ]
                 )
 
@@ -62,7 +62,7 @@ struct AboutScreen: View {
                     title: "Accessibility features",
                     systemImage: "accessibility",
                     bullets: [
-                        "Enable Speak results after scan in Menu → Accessibility to read results out loud.",
+                        "Enable Speak results after scan in Menu/Settings → Accessibility to read results out loud.",
                         "Adjust speech rate, pitch, and voice, then use Test speech to preview settings.",
                         "Enable Haptics for vibration feedback on the results screen.",
                         "Buttons are labeled for VoiceOver (Menu, Take picture, Import from library)."
@@ -73,7 +73,7 @@ struct AboutScreen: View {
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .padding(.top, 6)
-                                }
+            }
             .padding(16)
         }
         .navigationTitle("How to Use")
@@ -93,7 +93,7 @@ struct AboutScreen: View {
 
             Divider()
 
-            Label("No pouch cell nearby? No problem — you can still scan from an online source using another device. Simply use either a laptop/another phone to find an image of a pouch cell or even a swollen phone battery and still get that immediate result.", systemImage: "checkmark.seal.fill")
+            Label("No pouch cell nearby? No problem — you can still scan using an image from another device. For example, open a pouch cell or swollen battery image on a laptop, tablet, or second phone and scan it with your camera, or save or screenshot the image and import it from your library.", systemImage: "checkmark.seal.fill")
                 .font(.subheadline)
         }
         .padding(14)
@@ -154,4 +154,3 @@ struct AboutScreen: View {
         AboutScreen()
     }
 }
-
