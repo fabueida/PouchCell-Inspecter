@@ -21,30 +21,24 @@ struct HomeScreen: View {
 
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
     @AppStorage("didAnnounceSpeechTip") private var didAnnounceSpeechTip = false
-
-    // ✅ Use the Menu toggle here
     @AppStorage("pref_saveToPhotos") private var saveToPhotos: Bool = false
 
     @StateObject private var cameraManager = CameraPermissionManager()
     @StateObject private var photoPermissionManager = PhotoPermissionManager()
-
     @StateObject private var embeddedCamera = EmbeddedCameraModel()
 
     @State private var showMenu = false
     @State private var showUIKitPicker = false
-
     @State private var capturedImage: UIImage?
     @State private var showLoading = false
     @State private var resultPayload: DetectionResultPayload?
-
     @State private var cameraGranted = false
-
-    // ✅ Save-to-Photos UX
     @State private var showSaveToPhotosAlert = false
 
     private let classifier = DTImageClassifier()
 
     @Environment(\.scenePhase) private var scenePhase
+    @EnvironmentObject private var historyStore: ScanHistoryStore
 
     var body: some View {
         NavigationStack {
@@ -74,7 +68,6 @@ struct HomeScreen: View {
                 VStack(spacing: 18) {
 
                     VStack(spacing: 6) {
-                        
                         Text("Capture a photo to assess pouch cell condition.")
                             .font(.system(size: 15, weight: .medium))
                             .foregroundColor(cameraGranted ? .white.opacity(0.85) : .secondary)
@@ -179,16 +172,30 @@ struct HomeScreen: View {
                         }
                         .padding(.bottom, 8)
 
-                        NavigationLink {
-                            SafetyInfoView()
-                        } label: {
-                            Label("Safety Info", systemImage: "info.circle")
-                                .font(.system(size: 15, weight: .semibold))
-                                .foregroundColor(.white.opacity(0.9))
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 10)
-                                .background(.ultraThinMaterial)
-                                .cornerRadius(14)
+                        HStack(spacing: 10) {
+                            NavigationLink {
+                                HistoryView()
+                            } label: {
+                                Label("View Classification History", systemImage: "clock.arrow.circlepath")
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundColor(.white.opacity(0.9))
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 10)
+                                    .background(.ultraThinMaterial)
+                                    .cornerRadius(14)
+                            }
+
+                            NavigationLink {
+                                SafetyInfoView()
+                            } label: {
+                                Label("Safety Info", systemImage: "info.circle")
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundColor(.white.opacity(0.9))
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 10)
+                                    .background(.ultraThinMaterial)
+                                    .cornerRadius(14)
+                            }
                         }
                         .padding(.bottom, 26)
                     }
@@ -208,7 +215,6 @@ struct HomeScreen: View {
                 embeddedCamera.onCapture = { image in
                     capturedImage = image
 
-                    // ✅ Save to Photos only for camera scans (not imports)
                     if saveToPhotos {
                         Task { await saveScanToPhotosIfAllowed(image) }
                     }
@@ -246,22 +252,18 @@ struct HomeScreen: View {
             }
         }
         .task { try? Tips.configure() }
-
         .sheet(isPresented: $showMenu) {
             MenuView()
         }
-
         .sheet(isPresented: $showUIKitPicker) {
             ImagePicker { image in
                 capturedImage = image
                 runClassification()
             }
         }
-
         .fullScreenCover(isPresented: $showLoading) {
             AnalysisLoadingScreen()
         }
-
         .sheet(item: $resultPayload) { payload in
             DetectionResultScreen(
                 result: payload.result,
@@ -269,15 +271,13 @@ struct HomeScreen: View {
             )
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
-                }
+        }
         .alert("Photo Access Required", isPresented: $photoPermissionManager.showPermissionAlert) {
             Button("Open Settings") { photoPermissionManager.openSettings() }
             Button("Cancel", role: .cancel) { }
         } message: {
             Text("Please enable photo access in Settings to import an image.")
         }
-
-        // ✅ Save-to-Photos alert (only shown if user enabled saving, but iOS blocks saving)
         .alert("Can’t Save to Photos", isPresented: $showSaveToPhotosAlert) {
             Button("Open Settings") { openAppSettings() }
             Button("Cancel", role: .cancel) { }
@@ -285,8 +285,6 @@ struct HomeScreen: View {
             Text("To save scans to your Photos library, allow Photos access in Settings.")
         }
     }
-
-    // MARK: - Permissions
 
     private func requestCameraPermissionAndStart(silentIfDenied: Bool) async {
         let status = cameraManager.currentStatus()
@@ -307,10 +305,7 @@ struct HomeScreen: View {
         }
     }
 
-    // MARK: - Save to Photos
-
     private func saveScanToPhotosIfAllowed(_ image: UIImage) async {
-        // Use add-only authorization for saving
         let status = PHPhotoLibrary.authorizationStatus(for: .addOnly)
 
         if status == .authorized {
@@ -323,7 +318,6 @@ struct HomeScreen: View {
             return
         }
 
-        // .notDetermined -> request add-only
         let granted = await withCheckedContinuation { continuation in
             PHPhotoLibrary.requestAuthorization(for: .addOnly) { newStatus in
                 continuation.resume(returning: newStatus == .authorized)
@@ -352,8 +346,6 @@ struct HomeScreen: View {
         UIApplication.shared.open(url)
     }
 
-    // MARK: - Classification
-
     private func runClassification() {
         guard let image = capturedImage else { return }
         showLoading = true
@@ -373,9 +365,9 @@ struct HomeScreen: View {
                     resultString = "Unable to analyze image"
                 }
 
+                historyStore.add(resultText: resultString, image: image)
                 self.resultPayload = DetectionResultPayload(result: resultString, image: image)
             }
         }
     }
 }
-

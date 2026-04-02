@@ -8,8 +8,6 @@
 import SwiftUI
 import UIKit
 
-// MARK: - Domain
-
 enum BatteryCondition: Equatable {
     case normal
     case bulging
@@ -45,7 +43,6 @@ enum BatteryCondition: Equatable {
         }
     }
 
-    /// Phrase used for text-to-speech on the confirmation page.
     var speechPhrase: String {
         switch self {
         case .normal:
@@ -64,7 +61,7 @@ struct SafetyTipContent {
     let whatToDoNow: [String]
     let prevention: [String]
     let whenToEscalate: [String]
-    
+
     static func forCondition(_ condition: BatteryCondition) -> SafetyTipContent {
         switch condition {
         case .normal:
@@ -81,45 +78,44 @@ struct SafetyTipContent {
                     "Use the correct charger and charge profile (avoid overcharge).",
                     "Avoid high heat (car dashboards, direct sun, near heaters).",
                     "Don’t discharge below the manufacturer’s recommended cutoff.",
-                    "Use protective packaging and avoid mechanical stress during handling/shipping."
+                    "Use protective packaging and avoid mechanical stress during handling or shipping."
                 ],
                 whenToEscalate: [
-                    "If you notice heat, hissing, sweet/solvent odor, or rapid voltage drop, stop using the cell.",
+                    "If you notice heat, hissing, sweet or solvent odor, or rapid voltage drop, stop using the cell.",
                     "If the pouch begins to expand, treat it as bulging and follow the bulging guidance."
                 ]
             )
         case .bulging:
             return SafetyTipContent(
                 title: "Safety tips for: Bulging",
-                whatItMeans: "Bulging can indicate internal gas generation (from damage, overcharge, overheating, or aging). This increases the risk of venting, leaking, or thermal runaway.",
+                whatItMeans: "Bulging can indicate internal gas generation from damage, overcharge, overheating, or aging. This increases the risk of venting, leaking, or thermal runaway.",
                 whatToDoNow: [
-                    "Stop using/charging the cell immediately.",
+                    "Stop using or charging the cell immediately.",
                     "Move it to a non-flammable, well-ventilated area away from people and valuables.",
-                    "If available, place it in a fire-resistant container (e.g., LiPo-safe bag/metal box) on a non-combustible surface.",
-                    "Do NOT puncture, compress, or attempt to ‘flatten’ the pouch.",
-                    "If the cell is hot, smoking, or hissing: evacuate the area and contact local emergency guidance."
+                    "If available, place it in a fire-resistant container on a non-combustible surface.",
+                    "Do not puncture, compress, or attempt to flatten the pouch.",
+                    "If the cell is hot, smoking, or hissing, evacuate the area and follow local emergency guidance."
                 ],
                 prevention: [
-                    "Prevent overcharge: use a charger/BMS designed for the cell chemistry.",
-                    "Avoid heat: keep operating and storage temps within spec.",
-                    "Avoid mechanical damage: protect from bending, crushing, drops.",
+                    "Prevent overcharge by using a charger or battery management system designed for the cell chemistry.",
+                    "Avoid heat and keep operating and storage temperatures within specification.",
+                    "Avoid mechanical damage from bending, crushing, or drops.",
                     "Retire cells that show repeated swelling, abnormal heat, or significant capacity loss."
                 ],
                 whenToEscalate: [
-                    "Heat, smoke, hissing, or odor → treat as urgent.",
-                    "Visible leakage or torn pouch → handle with gloves, avoid inhalation, and isolate.",
-                    "Follow local disposal rules for damaged lithium batteries (many areas require special drop-off)."
+                    "Heat, smoke, hissing, or odor should be treated as urgent.",
+                    "Visible leakage or a torn pouch should be isolated and handled carefully.",
+                    "Follow local disposal rules for damaged lithium batteries."
                 ]
             )
-
         case .unknown:
             return SafetyTipContent(
                 title: "Safety tips for: Unknown",
-                whatItMeans: "The scan couldn’t confidently determine the condition—this often happens with poor lighting, glare, heavy shadows, or the cell being too far/too close.",
+                whatItMeans: "The scan couldn’t confidently determine the condition. This often happens with poor lighting, glare, heavy shadows, or the cell being too far away or out of focus.",
                 whatToDoNow: [
-                    "Re-scan with bright, even lighting (avoid harsh reflections).",
+                    "Re-scan with bright, even lighting and avoid harsh reflections.",
                     "Fill most of the frame with the pouch cell and keep it in focus.",
-                    "Capture the side profile as well—bulging is easier to see from an angle.",
+                    "Capture the side profile as well, since bulging is easier to see from an angle.",
                     "If you suspect swelling even without a confirmed result, follow the bulging precautions."
                 ],
                 prevention: [
@@ -129,7 +125,7 @@ struct SafetyTipContent {
                 ],
                 whenToEscalate: [
                     "If the cell feels warm at rest, smells unusual, looks swollen, or shows damage, stop use and isolate it.",
-                    "If you are unsure, consult a professional battery technician or follow your organization’s safety SOP."
+                    "If you are unsure, consult a professional battery technician or follow your organization’s safety procedures."
                 ]
             )
         }
@@ -138,34 +134,27 @@ struct SafetyTipContent {
 
 struct DetectionResultScreen: View {
     let result: String
-
-    // ✅ NEW: scanned/imported image
     let scannedImage: UIImage?
+    var shouldAnnounceAccessibilityFeedback: Bool = true
 
-    
     @Environment(\.dismiss) private var dismiss
     @State private var showSafetyTips = false
 
-    // Shared speech settings
     @EnvironmentObject private var speechStore: SpeechSettingsStore
     @State private var didSpeakResult = false
 
-    // Haptics (disabled by default; user can enable in Menu)
     @AppStorage("pref_haptics") private var hapticsEnabled: Bool = false
     @State private var didPlayHaptic = false
 
     private var condition: BatteryCondition { BatteryCondition(from: result) }
 
-            var body: some View {
+    var body: some View {
         NavigationStack {
             ZStack {
-                // Background (same as other screens)
                 Color(red: 0.86, green: 0.89, blue: 0.91)
                     .ignoresSafeArea()
 
                 VStack(spacing: 24) {
-
-                    // ✅ UPDATED: show image if available, otherwise show existing placeholder
                     Group {
                         if let uiImage = scannedImage {
                             Image(uiImage: uiImage)
@@ -190,14 +179,12 @@ struct DetectionResultScreen: View {
                     .padding(.horizontal, 32)
                     .padding(.top, 6)
 
-                    // Result text
                     Text("Battery is \(condition.displayName)")
                         .font(.system(size: 26, weight: .semibold))
                         .foregroundColor(.black)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 24)
 
-                    // Short explanation label
                     Text("Short Explanation")
                         .font(.system(size: 18, weight: .regular))
                         .foregroundColor(.black)
@@ -210,23 +197,19 @@ struct DetectionResultScreen: View {
 
                     Spacer()
 
-                    // Buttons
-                    VStack(spacing: 20) {
-                        
-                        Button {
-                            showSafetyTips = true
-                        } label: {
-                            Text("View Safety Tips")
-                                .accessibilityHint("Shows an overview on what to do depending on clasification result.")
-                                .font(.system(size: 20, weight: .medium))
-                                .foregroundColor(.black)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
-                                .background(Color(red: 0.73, green: 0.81, blue: 0.86))
-                                .cornerRadius(14)
-                        }
-                        .padding(.horizontal, 60)
+                    Button {
+                        showSafetyTips = true
+                    } label: {
+                        Text("View Safety Tips")
+                            .accessibilityHint("Shows an overview on what to do depending on clasification result.")
+                            .font(.system(size: 20, weight: .medium))
+                            .foregroundColor(.black)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(Color(red: 0.73, green: 0.81, blue: 0.86))
+                            .cornerRadius(14)
                     }
+                    .padding(.horizontal, 60)
 
                     Spacer(minLength: 24)
                 }
@@ -234,23 +217,23 @@ struct DetectionResultScreen: View {
             .navigationTitle("Result")
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
-                // Speak once when the confirmation/result sheet appears.
+                guard shouldAnnounceAccessibilityFeedback else { return }
                 guard !didSpeakResult else { return }
+
                 didSpeakResult = true
 
                 let phrase = condition.speechPhrase
 
-                // A tiny delay makes speech more reliable when presented as a sheet.
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                     SpeechManager.shared.speak(phrase, settings: speechStore.settings)
                 }
 
-                // Haptic feedback once when the result appears.
                 playResultHapticsIfNeeded()
             }
             .onDisappear {
-                // Avoid lingering speech if the user dismisses quickly.
-                SpeechManager.shared.stop()
+                if shouldAnnounceAccessibilityFeedback {
+                    SpeechManager.shared.stop()
+                }
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -260,7 +243,6 @@ struct DetectionResultScreen: View {
                         Image(systemName: "xmark")
                             .foregroundColor(.black)
                     }
-                    .accessibilityLabel("Close")
                 }
             }
             .sheet(isPresented: $showSafetyTips) {
@@ -271,13 +253,12 @@ struct DetectionResultScreen: View {
         }
     }
 
-    // MARK: - Haptics
-
     private func playResultHapticsIfNeeded() {
+        guard shouldAnnounceAccessibilityFeedback else { return }
         guard hapticsEnabled, !didPlayHaptic else { return }
+
         didPlayHaptic = true
 
-        // Small delay so it fires after the view fully presents.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
             switch condition {
             case .normal:
@@ -286,12 +267,10 @@ struct DetectionResultScreen: View {
                 gen.notificationOccurred(.success)
 
             case .bulging:
-                // Stronger + distinct “alert” feeling
                 let note = UINotificationFeedbackGenerator()
                 note.prepare()
                 note.notificationOccurred(.warning)
 
-                // Follow-up impact to make it feel more urgent.
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
                     let impact = UIImpactFeedbackGenerator(style: .heavy)
                     impact.prepare()
@@ -362,6 +341,6 @@ struct DetectionResultScreen_Previews: PreviewProvider {
     static var previews: some View {
         DetectionResultScreen(result: "Normal", scannedImage: nil)
             .environmentObject(SpeechSettingsStore.shared)
+            .environmentObject(ScanHistoryStore.shared)
     }
 }
-
