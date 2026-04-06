@@ -11,6 +11,11 @@ import UIKit
 import TipKit
 import AVFoundation
 
+private struct ScanPipelineResult {
+    let resultText: String
+    let displayImage: UIImage
+}
+
 private struct DetectionResultPayload: Identifiable {
     let id = UUID()
     let result: String
@@ -35,7 +40,8 @@ struct HomeScreen: View {
     @State private var cameraGranted = false
     @State private var showSaveToPhotosAlert = false
 
-    private let classifier = DTImageClassifier()
+    private let classifier = RFImageClassifier()
+    private let detector: PouchCellDetector? = try? PouchCellDetector(confidenceThreshold: 0.40)
 
     @Environment(\.scenePhase) private var scenePhase
     @EnvironmentObject private var historyStore: ScanHistoryStore
@@ -183,6 +189,7 @@ struct HomeScreen: View {
                                     .padding(.vertical, 10)
                                     .background(.ultraThinMaterial)
                                     .cornerRadius(14)
+                                    .accessibilityHint("Shows previously scanned classification results.")
                             }
 
                             NavigationLink {
@@ -195,6 +202,7 @@ struct HomeScreen: View {
                                     .padding(.vertical, 10)
                                     .background(.ultraThinMaterial)
                                     .cornerRadius(14)
+                                    .accessibilityHint("provides safety guidelines for handling lithium Pouch Cell batteries.")
                             }
                         }
                         .padding(.bottom, 26)
@@ -351,23 +359,58 @@ struct HomeScreen: View {
         showLoading = true
 
         DispatchQueue.global(qos: .userInitiated).async {
-            let result = try? classifier.classify(image)
+            let pipelineResult = analyzeImage(image)
 
             DispatchQueue.main.async {
                 showLoading = false
-
-                let resultString: String
-                if let result = result {
-                    let label = result.classLabel
-                    let confidence = result.topK.first?.prob ?? 0.0
-                    resultString = "\(label) - \(String(format: "%.2f", confidence * 100))"
-                } else {
-                    resultString = "Unable to analyze image"
-                }
-
-                historyStore.add(resultText: resultString, image: image)
-                self.resultPayload = DetectionResultPayload(result: resultString, image: image)
+                historyStore.add(resultText: pipelineResult.resultText, image: pipelineResult.displayImage)
+                self.resultPayload = DetectionResultPayload(
+                    result: pipelineResult.resultText,
+                    image: pipelineResult.displayImage
+                )
             }
+        }
+    }
+
+    private func analyzeImage(_ image: UIImage) -> ScanPipelineResult {
+        guard let detector = detector else {
+            return ScanPipelineResult(
+                resultText: "Unknown - detector unavailable",
+                displayImage: image
+            )
+        }
+
+        do {
+            let detection = try detector.detect(in: image)
+
+            guard detection.hasPouchCell else {
+                return ScanPipelineResult(
+                    resultText: "Unknown - no pouch cell detected",
+                    displayImage: image
+                )
+            }
+
+            let cropped = detector.cropBestPouchCell(from: image) ?? image
+            let classification = try classifier.classify(cropped)
+            let confidence = classification.topK.first?.prob ?? 0.0
+
+            guard confidence >= 0.65 else {
+                return ScanPipelineResult(
+                    resultText: "Unknown - low classification confidence",
+                    displayImage: cropped
+                )
+            }
+
+            return ScanPipelineResult(
+                resultText: "\(classification.classLabel) - \(String(format: "%.2f", confidence * 100))%",
+                displayImage: cropped
+            )
+
+        } catch {
+            return ScanPipelineResult(
+                resultText: "Unknown - analysis failed",
+                displayImage: image
+            )
         }
     }
 }
