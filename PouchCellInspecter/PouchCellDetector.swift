@@ -24,21 +24,21 @@ final class PouchCellDetector {
     private let request: VNCoreMLRequest
     private let confidenceThreshold: Float
 
-    init(confidenceThreshold: Float = 0.35) throws {
+    init(confidenceThreshold: Float = 0.25) throws {
         self.confidenceThreshold = confidenceThreshold
 
         guard let modelURL = Bundle.main.url(forResource: "PouchCellYolo", withExtension: "mlmodelc") else {
             throw NSError(
                 domain: "PouchCellDetector",
                 code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "PouchCellDetector.mlmodelc was not found in the app bundle."]
+                userInfo: [NSLocalizedDescriptionKey: "PouchCellYolo.mlmodelc was not found in the app bundle."]
             )
         }
 
         let mlModel = try MLModel(contentsOf: modelURL)
         let visionModel = try VNCoreMLModel(for: mlModel)
         self.request = VNCoreMLRequest(model: visionModel)
-        self.request.imageCropAndScaleOption = .scaleFill
+        self.request.imageCropAndScaleOption = .scaleFit
     }
 
     func detect(in image: UIImage) throws -> PouchCellDetectionResult {
@@ -58,12 +58,7 @@ final class PouchCellDetector {
         return PouchCellDetectionResult(observations: observations, confidenceThreshold: confidenceThreshold)
     }
 
-    func cropBestPouchCell(from image: UIImage, padding: CGFloat = 0.08) -> UIImage? {
-        guard let observation = try? detect(in: image).bestObservation else { return nil }
-        return crop(image: image, to: observation.boundingBox, padding: padding)
-    }
-
-    func crop(image: UIImage, to boundingBox: CGRect, padding: CGFloat = 0.08) -> UIImage? {
+    func crop(image: UIImage, to boundingBox: CGRect, padding: CGFloat = 0.12) -> UIImage? {
         let normalizedImage = image.normalizedForModel()
         guard let cgImage = normalizedImage.cgImage else { return nil }
 
@@ -76,8 +71,9 @@ final class PouchCellDetector {
         rect = rect.insetBy(dx: -dx, dy: -dy)
         rect = rect.intersection(CGRect(x: 0, y: 0, width: width, height: height)).integral
 
+        guard rect.width > 1, rect.height > 1 else { return nil }
         guard let cropped = cgImage.cropping(to: rect) else { return nil }
-        return UIImage(cgImage: cropped)
+        return UIImage(cgImage: cropped, scale: normalizedImage.scale, orientation: .up)
     }
 }
 

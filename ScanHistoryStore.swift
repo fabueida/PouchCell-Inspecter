@@ -8,6 +8,7 @@
 import SwiftUI
 import UIKit
 import Combine
+
 struct ScanHistoryItem: Identifiable, Codable, Equatable {
     let id: UUID
     let resultText: String
@@ -57,7 +58,7 @@ final class ScanHistoryStore: ObservableObject {
     }
 
     func add(resultText: String, image: UIImage?) {
-        let compressedImageData = image?.jpegData(compressionQuality: 0.72)
+        let compressedImageData = image?.historyThumbnailData(maxDimension: 900, compressionQuality: 0.60)
 
         let newItem = ScanHistoryItem(
             resultText: resultText,
@@ -105,5 +106,27 @@ final class ScanHistoryStore: ObservableObject {
         } catch {
             assertionFailure("Failed to save scan history: \(error)")
         }
+    }
+}
+
+private extension UIImage {
+    func historyThumbnailData(maxDimension: CGFloat, compressionQuality: CGFloat) -> Data? {
+        let longestSide = max(size.width, size.height)
+        let targetImage: UIImage
+
+        if longestSide > maxDimension, longestSide > 0 {
+            let scaleRatio = maxDimension / longestSide
+            let newSize = CGSize(width: size.width * scaleRatio, height: size.height * scaleRatio)
+            let format = UIGraphicsImageRendererFormat.default()
+            format.scale = 1
+            let renderer = UIGraphicsImageRenderer(size: newSize, format: format)
+            targetImage = renderer.image { _ in
+                draw(in: CGRect(origin: .zero, size: newSize))
+            }
+        } else {
+            targetImage = self
+        }
+
+        return targetImage.jpegData(compressionQuality: compressionQuality)
     }
 }
