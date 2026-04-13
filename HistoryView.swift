@@ -130,7 +130,7 @@ struct HistoryView: View {
             Text("No scans saved yet")
                 .font(.title3.weight(.semibold))
 
-            Text("After a battery is analyzed, its classification result will appear here so you can reopen it later and review the full safety tips.")
+            Text("After a battery is analyzed, its classification result will appear here.")
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -142,8 +142,7 @@ struct HistoryView: View {
                 .fill(Color(.secondarySystemGroupedBackground))
         )
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("No scans saved yet. After a battery is analyzed, its classification result will appear here so you can reopen it later and review the full safety tips.")
-    }
+            }
 
     private var summaryAccessibilityLabel: String {
         if let latest = historyStore.items.first {

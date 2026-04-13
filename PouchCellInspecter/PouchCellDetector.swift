@@ -1,3 +1,10 @@
+//
+//  PouchCellDetector.swift
+//  PouchCellInspector
+//
+//  Created by Firas Abueida on 1/1/26.
+//
+
 import CoreML
 import Vision
 import UIKit
@@ -7,25 +14,31 @@ struct PouchCellDetectionResult {
     let confidenceThreshold: Float
 
     var detectedObservations: [VNRecognizedObjectObservation] {
-        observations.filter { observation in
-            observation.confidence >= confidenceThreshold &&
-            (observation.labels.first?.identifier == "pouch_cell" || observation.labels.isEmpty)
-        }
+        observations.filter { $0.confidence >= confidenceThreshold }
     }
 
-    var hasPouchCell: Bool { !detectedObservations.isEmpty }
+    var hasPouchCell: Bool {
+        !detectedObservations.isEmpty
+    }
+
     var bestObservation: VNRecognizedObjectObservation? {
         detectedObservations.max(by: { $0.confidence < $1.confidence })
     }
-    var bestConfidence: Float { bestObservation?.confidence ?? 0 }
+
+    var bestConfidence: Float {
+        bestObservation?.confidence ?? 0
+    }
 }
 
 final class PouchCellDetector {
-    private let request: VNCoreMLRequest
+    private let visionModel: VNCoreMLModel
     private let confidenceThreshold: Float
 
-    init(confidenceThreshold: Float = 0.25) throws {
+    init(confidenceThreshold: Float = 0.5) throws {
         self.confidenceThreshold = confidenceThreshold
+
+        let configuration = MLModelConfiguration()
+        configuration.computeUnits = .all
 
         guard let modelURL = Bundle.main.url(forResource: "PouchCellYolo", withExtension: "mlmodelc") else {
             throw NSError(
@@ -35,14 +48,13 @@ final class PouchCellDetector {
             )
         }
 
-        let mlModel = try MLModel(contentsOf: modelURL)
-        let visionModel = try VNCoreMLModel(for: mlModel)
-        self.request = VNCoreMLRequest(model: visionModel)
-        self.request.imageCropAndScaleOption = .scaleFit
+        let mlModel = try MLModel(contentsOf: modelURL, configuration: configuration)
+        self.visionModel = try VNCoreMLModel(for: mlModel)
     }
 
     func detect(in image: UIImage) throws -> PouchCellDetectionResult {
         let normalized = image.normalizedForModel()
+
         guard let cgImage = normalized.cgImage else {
             throw NSError(
                 domain: "PouchCellDetector",
@@ -51,29 +63,65 @@ final class PouchCellDetector {
             )
         }
 
-        let handler = VNImageRequestHandler(cgImage: cgImage, orientation: .up)
+        var capturedResults: [VNRecognizedObjectObservation] = []
+
+        let request = VNCoreMLRequest(model: visionModel) { request, error in
+            if let error = error {
+                print("PouchCellDetector Vision error: \(error.localizedDescription)")
+                capturedResults = []
+                return
+            }
+
+            capturedResults = request.results as? [VNRecognizedObjectObservation] ?? []
+        }
+
+        request.imageCropAndScaleOption = .scaleFill
+        request.preferBackgroundProcessing = true
+
+        let handler = VNImageRequestHandler(
+            cgImage: cgImage,
+            orientation: .up,
+            options: [:]
+        )
+
         try handler.perform([request])
 
-        let observations = request.results as? [VNRecognizedObjectObservation] ?? []
-        return PouchCellDetectionResult(observations: observations, confidenceThreshold: confidenceThreshold)
+        return PouchCellDetectionResult(
+            observations: capturedResults,
+            confidenceThreshold: confidenceThreshold
+        )
     }
 
     func crop(image: UIImage, to boundingBox: CGRect, padding: CGFloat = 0.12) -> UIImage? {
         let normalizedImage = image.normalizedForModel()
+
         guard let cgImage = normalizedImage.cgImage else { return nil }
 
         let width = CGFloat(cgImage.width)
         let height = CGFloat(cgImage.height)
 
-        var rect = VNImageRectForNormalizedRect(boundingBox, Int(width), Int(height))
+        var rect = VNImageRectForNormalizedRect(
+            boundingBox,
+            Int(width),
+            Int(height)
+        )
+
         let dx = rect.width * padding
         let dy = rect.height * padding
         rect = rect.insetBy(dx: -dx, dy: -dy)
-        rect = rect.intersection(CGRect(x: 0, y: 0, width: width, height: height)).integral
+
+        rect = rect
+            .intersection(CGRect(x: 0, y: 0, width: width, height: height))
+            .integral
 
         guard rect.width > 1, rect.height > 1 else { return nil }
         guard let cropped = cgImage.cropping(to: rect) else { return nil }
-        return UIImage(cgImage: cropped, scale: normalizedImage.scale, orientation: .up)
+
+        return UIImage(
+            cgImage: cropped,
+            scale: normalizedImage.scale,
+            orientation: .up
+        )
     }
 }
 
