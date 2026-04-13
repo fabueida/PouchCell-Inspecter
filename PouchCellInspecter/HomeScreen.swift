@@ -42,7 +42,7 @@ struct HomeScreen: View {
     @State private var showSaveToPhotosAlert = false
 
     private let classifier = RFImageClassifier()
-    private let detector: PouchCellDetector? = try? PouchCellDetector(confidenceThreshold: 0.25)
+    private let detector: PouchCellDetector? = try? PouchCellDetector(confidenceThreshold: 0.5)
 
     @Environment(\.scenePhase) private var scenePhase
     @EnvironmentObject private var historyStore: ScanHistoryStore
