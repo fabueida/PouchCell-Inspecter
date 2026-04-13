@@ -41,7 +41,7 @@ struct HomeScreen: View {
     @State private var cameraGranted = false
     @State private var showSaveToPhotosAlert = false
 
-    private let classifier = DTImageClassifier()
+    private let classifier = RFImageClassifier()
     private let detector: PouchCellDetector? = try? PouchCellDetector(confidenceThreshold: 0.25)
 
     @Environment(\.scenePhase) private var scenePhase
