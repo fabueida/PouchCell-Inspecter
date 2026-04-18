@@ -136,7 +136,7 @@ https://apps.apple.com/us/app/pouch-cell-inspector/id6757132440
 
 2. Grant Permissions if Needed
 
-After installing the app, open it and follow any permission prompts if they appear.
+After installing the application, open it and follow any permission prompts if they appear.
 
 The app may request:
 - Camera access for live pouch cell scanning
@@ -156,7 +156,7 @@ To inspect a pouch cell using the camera:
 4. Wait for the app to process the image
 5. Review the classification result and confidence score
 
-The app will classify the pouch cell as **Normal** or **Bulging**.
+The app will classify the pouch cell as **Normal** **Bulging** or ** unknown if No pouch cell is detected**.
 
 ---
 
@@ -167,7 +167,7 @@ Users can also inspect an existing image from their Photo Library.
 To import a photo:
 
 1. Tap the **Import from Library** button or photo icon
-2. Choose a pouch cell image from the Photo Library
+2. Choose a pouch cell image from your Photo Library
 3. Wait for the app to classify the image
 4. Review the result and confidence score
 
