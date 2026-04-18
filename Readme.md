@@ -219,7 +219,7 @@ Settings may include:
 
 Pouch Cell Inspector is designed with privacy in mind. Machine learning classification runs on-device, and images are not uploaded to a cloud server for inspection.
 
-View the privacy policy here:
+View our privacy policy here:
 https://github.com/fabueida/PouchCellInspector-PrivacyPolicy
 
 ## getting started for developers 
