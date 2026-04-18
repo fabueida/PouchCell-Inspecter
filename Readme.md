@@ -127,18 +127,9 @@ These features help ensure inspections remain consistent, accessible, and safe w
 
 ---
 
-## Getting Started
-
-
-Absolutely — here’s just the **Getting Started for Users** section, rewritten in a numbered style similar to your developer instructions:
-
-```markdown
 ## Getting Started for Users
 
-1. Download from the iOS App Store
-
-
-
+1. Download from the iOS App Store:
 https://apps.apple.com/us/app/pouch-cell-inspector/id6757132440
 
 ---
@@ -150,7 +141,6 @@ After installing the app, open it and follow any permission prompts if they appe
 The app may request:
 - Camera access for live pouch cell scanning
 - Photo Library access for importing existing images
-- Speech or audio access if spoken feedback features are enabled
 
 Permissions can be changed later in the iPhone Settings app.
 
@@ -230,7 +220,6 @@ Settings may include:
 Pouch Cell Inspector is designed with privacy in mind. Machine learning classification runs on-device, and images are not uploaded to a cloud server for inspection.
 
 View the privacy policy here:
-
 https://github.com/fabueida/PouchCellInspector-PrivacyPolicy
 
 ## getting started for developers 
