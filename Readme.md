@@ -130,8 +130,110 @@ These features help ensure inspections remain consistent, accessible, and safe w
 ## Getting Started
 
 
-download from the iOS App Store:
+Absolutely — here’s just the **Getting Started for Users** section, rewritten in a numbered style similar to your developer instructions:
+
+```markdown
+## Getting Started for Users
+
+1. Download from the iOS App Store
+
+
+
 https://apps.apple.com/us/app/pouch-cell-inspector/id6757132440
+
+---
+
+2. Grant Permissions if Needed
+
+After installing the app, open it and follow any permission prompts if they appear.
+
+The app may request:
+- Camera access for live pouch cell scanning
+- Photo Library access for importing existing images
+- Speech or audio access if spoken feedback features are enabled
+
+Permissions can be changed later in the iPhone Settings app.
+
+---
+
+3. Capture a Pouch Cell Image
+
+To inspect a pouch cell using the camera:
+
+1. Open Pouch Cell Inspector
+2. Point the camera at the pouch cell, or any online image
+3. Tap the **Take Picture** button or camera capture icon
+4. Wait for the app to process the image
+5. Review the classification result and confidence score
+
+The app will classify the pouch cell as **Normal** or **Bulging**.
+
+---
+
+4. Import a Photo
+
+Users can also inspect an existing image from their Photo Library.
+
+To import a photo:
+
+1. Tap the **Import from Library** button or photo icon
+2. Choose a pouch cell image from the Photo Library
+3. Wait for the app to classify the image
+4. Review the result and confidence score
+
+This is useful for reviewing previously captured images or inspecting a pouch cell image when live camera scanning is not available.
+
+---
+
+5. View Inspection History
+
+The app includes a history feature for reviewing previous inspection results.
+
+To view past inspections:
+
+1. Tap **View Classification History**
+2. Browse previous scan results
+3. Select a saved result to review its classification details
+
+Inspection history can help users keep track of past results, timestamps, and scan records.
+
+---
+
+6. View Safety Info
+
+The **Safety Info** section teaches important information about lithium-ion pouch batteries.
+
+This section explains:
+- What pouch cell swelling may indicate
+- Why bulging lithium-ion batteries can be dangerous
+- General safety precautions
+- When users should stop using or handling a damaged cell
+
+Safety information is provided for awareness and should not replace professional battery safety procedures when required.
+
+---
+
+7. Change Settings
+
+Users can tap the **Settings** icon in the top-left corner of the app to change preferences at any time.
+
+Settings may include:
+- Spoken feedback
+- Haptic feedback
+- Display or appearance options
+- Privacy information
+
+---
+
+8. View Privacy Policy
+
+Pouch Cell Inspector is designed with privacy in mind. Machine learning classification runs on-device, and images are not uploaded to a cloud server for inspection.
+
+View the privacy policy here:
+
+https://github.com/fabueida/PouchCellInspector-PrivacyPolicy
+
+## getting started for developers 
 
 1. Clone the Repository
 
