@@ -129,6 +129,10 @@ These features help ensure inspections remain consistent, accessible, and safe w
 
 ## Getting Started
 
+
+download from the iOS App Store:
+https://apps.apple.com/us/app/pouch-cell-inspector/id6757132440
+
 1. Clone the Repository
 
 ```bash
