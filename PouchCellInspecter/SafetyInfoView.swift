@@ -41,6 +41,20 @@ struct SafetyInfoView: View {
                 doDontGrid
 
                 infoCard(
+                    title: "Replacing a Bulging Lithium-Ion Battery",
+                    systemImage: "wrench.and.screwdriver.fill",
+                    bullets: [
+                        "Do not charge, press, puncture, bend, or keep using a bulging lithium-ion battery.",
+                        "Power off the device immediately if it is safe to do so.",
+                        "Battery replacement should only be handled by a qualified technician or an authorized repair provider.",
+                        "Do not try to remove or replace a swollen pouch cell yourself unless you are properly trained and have the correct safety equipment.",
+                        "Keep the device away from heat, flammable materials, and direct sunlight while you arrange safe service.",
+                        "If the battery is hot, leaking, smoking, making noise, or has a strong odor, move away and contact emergency services or local hazardous waste guidance.",
+                        "Never throw the old battery in regular trash. Take it to an approved battery recycling or hazardous waste location."
+                    ]
+                )
+
+                infoCard(
                     title: "Disposal and next steps",
                     systemImage: "arrow.triangle.2.circlepath",
                     bullets: [
@@ -179,5 +193,4 @@ struct SafetyInfoView: View {
         return "\(title). \(joined)"
     }
 }
-
 
