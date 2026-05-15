@@ -10,7 +10,7 @@ import AVFoundation
 import MessageUI
 import UIKit
 
-struct MenuView: View {
+struct SettingsView: View {
 
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var speechStore: SpeechSettingsStore
@@ -164,13 +164,17 @@ struct MenuView: View {
                     Button { openAppSettings() } label: {
                         Label("Open iOS Settings", systemImage: "gearshape")
                     }
-                }
-
-                Section("About") {
-                    NavigationLink {
+                    
+                                    NavigationLink {
                         AboutScreen()
                     } label: {
-                        Label("Learn more about Pouch Cell Inspector", systemImage: "book")
+                        Label("Quick Start Guide", systemImage: "book")
+                    }
+
+                    NavigationLink {
+                        BatteryEducationView()
+                    } label: {
+                        Label("Learn more about Pouch Cell Inspector", systemImage: "battery.100percent")
                     }
                 }
 

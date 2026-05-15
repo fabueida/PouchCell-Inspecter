@@ -12,60 +12,73 @@ struct AboutScreen: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-
                 introCard
 
                 infoCard(
-                    title: "Quick start (Home Screen)",
-                    systemImage: "house.fill",
-                    bullets: [
-                        "Tap Take picture to capture a photo and scan (the large center capture button).",
-                        "Or tap Import from library to scan a saved image.",
-                        "You can use either option even if you don’t have a pouch cell in front of you (sample images and online images work too)."
-                    ]
-                )
-
-                infoCard(
-                    title: "Scan with the camera (Take picture)",
+                    title: "Scan with Camera",
                     systemImage: "camera.fill",
                     bullets: [
-                        "From the Home Screen, tap Take picture (the large center capture button).",
-                        "Point at the pouch cell, or point at an image shown on another device.",
-                        "Keep it centered and in focus, then capture the photo.",
-                        "You’ll get a result within seconds."
+                        "From the Home Screen, tap Take picture.",
+                        "Position the pouch cell clearly in the frame with good lighting.",
+                        "Capture the photo and wait for the app to analyze it."
                     ]
                 )
 
                 infoCard(
-                    title: "Import from Library (saved / online images)",
+                    title: "Import from Photos",
                     systemImage: "photo.on.rectangle",
                     bullets: [
-                        "From the Home Screen, tap Import from library (photo icon).",
-                        "Pick an image from Photos and the app will scan it right away.",
-                        "To use an image from online: save it to Photos or take a screenshot first, then import it here.",
-                        "This is great for testing, scanning reference images, or scanning images shared by someone else."
+                        "From the Home Screen, tap Import from library.",
+                        "Choose an image from Photos and the app will process it automatically.",
+                        "For best results, use a sharp image where the pouch cell is visible and not blocked."
                     ]
                 )
 
                 infoCard(
-                    title: "Tips for best results",
-                    systemImage: "wand.and.stars",
+                    title: "Share from Another App",
+                    systemImage: "square.and.arrow.up",
                     bullets: [
-                        "Use good lighting and avoid strong glare.",
-                        "Keep the pouch cell (or image) sharp and filling most of the frame.",
-                        "Use the flash toggle if you’re in low light.",
-                        "If a scan looks off, try a clearer photo or a different angle."
+                        "Share an image from apps like Photos, Messages, WhatsApp, Safari, or Files.",
+                        "Tap Share, then select Pouch Cell Inspector.",
+                        "The app opens and processes the shared image automatically."
                     ]
                 )
 
                 infoCard(
-                    title: "Accessibility features",
-                    systemImage: "accessibility",
+                    title: "View Results",
+                    systemImage: "doc.text.magnifyingglass",
                     bullets: [
-                        "Enable Speak results after scan in Menu/Settings → Accessibility to read results out loud.",
-                        "Adjust speech rate, pitch, and voice, then use Test speech to preview settings.",
-                        "Enable Haptics for vibration feedback on the results screen.",
-                        "Buttons are labeled for VoiceOver (Menu, Take picture, Import from library)."
+                        "After analysis, the results screen shows whether the image appears Normal, Bulging, or Unknown.",
+                        "Review the short explanation shown with the classification.",
+                        "If the result does not look right, try another clear photo from a different angle."
+                    ]
+                )
+
+                infoCard(
+                    title: "Safety Tips",
+                    systemImage: "checkmark.shield.fill",
+                    bullets: [
+                        "Open Safety Info from the Home Screen or results screen for action-focused safety guidance.",
+                        "Use Safety Info when you need to know what to do after a result or when a battery appears unsafe."
+                    ]
+                )
+
+                infoCard(
+                    title: "Scan History",
+                    systemImage: "clock.arrow.circlepath",
+                    bullets: [
+                        "Open History from the Home Screen to review available past scan results.",
+                        "Use history to compare recent classifications that are stored locally on your device."
+                    ]
+                )
+
+                infoCard(
+                    title: "Settings and Preferences",
+                    systemImage: "gearshape.fill",
+                    bullets: [
+                        "Open Settings to adjust speech feedback, haptics, appearance, and photo-saving behavior.",
+                        "Use Test speech to preview result readouts when speech feedback is enabled.",
+                        "Settings also includes privacy information, this guide, and battery education."
                     ]
                 )
 
@@ -76,7 +89,7 @@ struct AboutScreen: View {
             }
             .padding(16)
         }
-        .navigationTitle("How to Use")
+        .navigationTitle("Quick Start Guide")
         .navigationBarTitleDisplayMode(.inline)
     }
 
@@ -84,17 +97,12 @@ struct AboutScreen: View {
 
     private var introCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("User Guide")
+            Text("Quick Start Guide")
                 .font(.title2.bold())
 
-            Text("Scan a pouch cell using the camera, or import an image from your library and get a result within seconds.")
+            Text("Learn the main ways to scan a pouch cell, review results, and adjust app preferences.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
-
-            Divider()
-
-            Label("No pouch cell nearby? No problem — you can still scan using an image from another device. For example, open a pouch cell or swollen battery image on a laptop, tablet, or second phone and scan it with your camera, or save or screenshot the image and import it from your library.", systemImage: "checkmark.seal.fill")
-                .font(.subheadline)
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -105,7 +113,6 @@ struct AboutScreen: View {
             RoundedRectangle(cornerRadius: 18)
                 .strokeBorder(Color.secondary.opacity(0.25), lineWidth: 1)
         )
-        .accessibilityElement(children: .combine)
     }
 
     private func infoCard(title: String, systemImage: String, bullets: [String]) -> some View {
@@ -128,8 +135,6 @@ struct AboutScreen: View {
             RoundedRectangle(cornerRadius: 18)
                 .strokeBorder(Color.secondary.opacity(0.15), lineWidth: 1)
         )
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(accessibilityCardLabel(title: title, bullets: bullets))
     }
 
     private func bulletRow(_ text: String) -> some View {
@@ -142,10 +147,6 @@ struct AboutScreen: View {
             Text(text)
                 .font(.subheadline)
         }
-    }
-
-    private func accessibilityCardLabel(title: String, bullets: [String]) -> String {
-        "\(title). \(bullets.joined(separator: " "))"
     }
 }
 
