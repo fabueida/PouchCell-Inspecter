@@ -9,6 +9,43 @@ import SwiftUI
 import UIKit
 import Combine
 
+enum HistoryRetention: String, CaseIterable, Identifiable {
+    case forever
+    case ninetyDays
+    case thirtyDays
+    case off
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .forever:
+            return "Forever"
+        case .ninetyDays:
+            return "90 Days"
+        case .thirtyDays:
+            return "30 Days"
+        case .off:
+            return "Off"
+        }
+    }
+
+    var dayLimit: Int? {
+        switch self {
+        case .forever, .off:
+            return nil
+        case .ninetyDays:
+            return 90
+        case .thirtyDays:
+            return 30
+        }
+    }
+
+    static var retentionChoices: [HistoryRetention] {
+        [.forever, .ninetyDays, .thirtyDays]
+    }
+}
+
 struct ScanHistoryItem: Identifiable, Codable, Equatable {
     let id: UUID
     let resultText: String
@@ -46,11 +83,15 @@ final class ScanHistoryStore: ObservableObject {
 
     @Published private(set) var items: [ScanHistoryItem] = []
 
+    static let saveClassificationsLocallyKey = "pref_saveClassificationsLocally"
+    static let historyRetentionKey = "pref_historyRetention"
+
     private let storageKey = "scanHistoryItems"
     private let maxItems = 50
 
     private init() {
         load()
+        applyCurrentSettings()
     }
 
     var hasHistory: Bool {
@@ -58,6 +99,10 @@ final class ScanHistoryStore: ObservableObject {
     }
 
     func add(resultText: String, image: UIImage?) {
+        applyCurrentSettings()
+
+        guard isLocalHistorySavingEnabled else { return }
+
         let compressedImageData = image?.historyThumbnailData(maxDimension: 900, compressionQuality: 0.60)
 
         let newItem = ScanHistoryItem(
@@ -73,6 +118,13 @@ final class ScanHistoryStore: ObservableObject {
         }
 
         save()
+    }
+
+    func applyCurrentSettings() {
+        switch historyRetention {
+        case .forever, .ninetyDays, .thirtyDays, .off:
+            pruneExpiredHistory()
+        }
     }
 
     func delete(at offsets: IndexSet) {
@@ -106,6 +158,36 @@ final class ScanHistoryStore: ObservableObject {
         } catch {
             assertionFailure("Failed to save scan history: \(error)")
         }
+    }
+
+    private var isLocalHistorySavingEnabled: Bool {
+        isSaveClassificationsLocallyEnabled
+    }
+
+    private var isSaveClassificationsLocallyEnabled: Bool {
+        UserDefaults.standard.object(forKey: Self.saveClassificationsLocallyKey) as? Bool ?? true
+    }
+
+    private var historyRetention: HistoryRetention {
+        guard let rawValue = UserDefaults.standard.string(forKey: Self.historyRetentionKey),
+              let retention = HistoryRetention(rawValue: rawValue) else {
+            return .forever
+        }
+
+        return retention
+    }
+
+    private func pruneExpiredHistory() {
+        guard let dayLimit = historyRetention.dayLimit,
+              let cutoffDate = Calendar.current.date(byAdding: .day, value: -dayLimit, to: Date()) else {
+            return
+        }
+
+        let prunedItems = items.filter { $0.createdAt >= cutoffDate }
+        guard prunedItems.count != items.count else { return }
+
+        items = prunedItems
+        save()
     }
 }
 

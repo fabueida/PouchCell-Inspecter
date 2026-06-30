@@ -20,7 +20,8 @@ struct AboutScreen: View {
                     bullets: [
                         "From the Home Screen, tap Take picture.",
                         "Position the pouch cell clearly in the frame with good lighting.",
-                        "Capture the photo and wait for the app to analyze it."
+                        "You can scan a real pouch cell in front of you or even point the camera at an online image displayed on another screen.",
+                        "Capture the photo and wait for the app to analyze it within seconds."
                     ]
                 )
 
@@ -30,6 +31,7 @@ struct AboutScreen: View {
                     bullets: [
                         "From the Home Screen, tap Import from library.",
                         "Choose an image from Photos and the app will process it automatically.",
+                        "You can import saved screenshots, downloaded battery images, or photos someone previously sent you.",
                         "For best results, use a sharp image where the pouch cell is visible and not blocked."
                     ]
                 )
@@ -40,7 +42,8 @@ struct AboutScreen: View {
                     bullets: [
                         "Share an image from apps like Photos, Messages, WhatsApp, Safari, or Files.",
                         "Tap Share, then select Pouch Cell Inspector.",
-                        "The app opens and processes the shared image automatically."
+                        "The app opens automatically and processes the shared image right away.",
+                        "This makes it faster to analyze a battery image without needing to manually save it first."
                     ]
                 )
 
@@ -82,7 +85,7 @@ struct AboutScreen: View {
                     ]
                 )
 
-                Text("Note: This guide explains how to use the application. It does not replace professional inspection or safety procedures.")
+                Text("Note: Pouch Cell Inspector is designed as an assistive screening tool that helps users quickly analyze pouch cell battery images, including real-world photos, screenshots, online images, and shared images from other apps. It does not replace professional inspection or safety procedures.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .padding(.top, 6)
@@ -100,7 +103,7 @@ struct AboutScreen: View {
             Text("Quick Start Guide")
                 .font(.title2.bold())
 
-            Text("Learn the main ways to scan a pouch cell, review results, and adjust app preferences.")
+            Text("Learn the main ways to scan pouch cell battery images, review results, and adjust app preferences.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
