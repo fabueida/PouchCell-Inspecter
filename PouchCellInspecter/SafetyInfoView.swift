@@ -20,8 +20,8 @@ struct SafetyInfoView: View {
                     systemImage: "exclamationmark.triangle.fill",
                     bullets: [
                         "Swelling can indicate gas buildup from damage, overheating, overcharging, or internal failure.",
-                        "Pressure can weaken the pouch casing. A puncture or rupture can vent hot gases and flammable electrolyte.",
-                        "A failing lithium battery can enter thermal runaway, causing intense heat, smoke, or fire."
+                        "Pressure can weaken the pouch casing. A puncture or rupture can release hot gases or battery chemicals.",
+                        "Continued use may increase the risk of device damage, overheating, or battery failure."
                     ]
                 )
 
@@ -29,46 +29,78 @@ struct SafetyInfoView: View {
                     title: "Safest immediate actions",
                     systemImage: "checkmark.shield.fill",
                     bullets: [
-                        "Stop using the device immediately.",
-                        "Disconnect from the charger (do not continue charging).",
+                        "Stop using the device if the battery appears swollen, damaged, hot, leaking, or unsafe.",
+                        "Disconnect from the charger and do not continue charging a visibly swollen battery.",
                         "Power off the device if you can do so safely.",
                         "Move it away from people, pets, and anything flammable.",
-                        "Place it on a non-flammable surface (concrete, tile, or metal) in a well-ventilated area.",
-                        "If you notice heat, smoke, hissing, or a strong chemical smell: evacuate and call local emergency services."
+                        "Place it on a non-flammable surface, such as concrete, tile, or metal, in a well-ventilated area."
                     ]
                 )
 
                 doDontGrid
 
                 infoCard(
-                    title: "Replacing a Bulging Lithium-Ion Battery",
-                    systemImage: "wrench.and.screwdriver.fill",
+                    title: "When Batteries Should Be Replaced",
+                    systemImage: "battery.25percent",
                     bullets: [
-                        "Do not charge, press, puncture, bend, or keep using a bulging lithium-ion battery.",
-                        "Power off the device immediately if it is safe to do so.",
-                        "Battery replacement should only be handled by a qualified technician or an authorized repair provider.",
-                        "Do not try to remove or replace a swollen pouch cell yourself unless you are properly trained and have the correct safety equipment.",
-                        "Keep the device away from heat, flammable materials, and direct sunlight while you arrange safe service.",
-                        "If the battery is hot, leaking, smoking, making noise, or has a strong odor, move away and contact emergency services or local hazardous waste guidance.",
-                        "Never throw the old battery in regular trash. Take it to an approved battery recycling or hazardous waste location."
+                        "Replace or professionally service a battery that appears swollen or physically deformed.",
+                        "Seek replacement if the device screen, trackpad, back cover, or casing is lifting or separating.",
+                        "Treat unusual overheating, expanding over time, abnormal charging behavior, leakage, odor, smoke, discoloration, punctures, or impact damage as warning signs."
                     ]
                 )
 
                 infoCard(
-                    title: "Disposal and next steps",
+                    title: "General Replacement Guidance",
+                    systemImage: "wrench.and.screwdriver.fill",
+                    bullets: [
+                        "Avoid puncturing, bending, crushing, pressing, or trying to flatten a swollen battery.",
+                        "Use a qualified technician, authorized repair provider, or manufacturer guidance when possible.",
+                        "Use manufacturer-approved or reputable replacement parts that match the device requirements.",
+                        "Do not try to remove or replace a swollen pouch cell yourself unless you are properly trained and have the right safety equipment.",
+                        "Keep the device away from heat, flammable materials, and direct sunlight while you arrange service."
+                    ]
+                )
+
+                infoCard(
+                    title: "Warning Signs",
+                    systemImage: "eye.trianglebadge.exclamationmark.fill",
+                    bullets: [
+                        "Visible swelling, bubbling, or a soft pouch that looks inflated.",
+                        "A screen, case, keyboard, or panel lifting away from the device body.",
+                        "Unusual heat during use, storage, or charging.",
+                        "Leaking fluid, strong odor, smoke, discoloration, or new physical damage."
+                    ]
+                )
+
+                infoCard(
+                    title: "When to Escalate",
+                    systemImage: "phone.fill",
+                    bullets: [
+                        "Move away and seek immediate help if you see smoke, rapid swelling, leaking fluid, or signs of burning.",
+                        "If the device becomes excessively hot or gives off a burning or chemical smell, stop handling it and contact local emergency or hazardous waste guidance.",
+                        "Do not transport a battery that appears actively overheating, leaking, smoking, or rapidly swelling unless local safety guidance tells you how to do so."
+                    ]
+                )
+
+                infoCard(
+                    title: "Disposal and Recycling",
                     systemImage: "arrow.triangle.2.circlepath",
                     bullets: [
-                        "Do not throw it in household trash or standard recycling.",
-                        "Contact your local battery recycling program or hazardous waste drop-off site.",
+                        "Do not throw damaged lithium-ion batteries in household trash.",
+                        "Use an approved battery recycling, e-waste, or hazardous waste drop-off location.",
                         "For device batteries, consider contacting the manufacturer or a certified repair shop for safe replacement and disposal."
                     ]
                 )
 
-                Text("This screen provides general safety guidance and is not a substitute for professional advice. If there is immediate danger, prioritize safety and contact local emergency services.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .padding(.top, 6)
-                    .accessibilityLabel("Disclaimer. This screen provides general safety guidance and is not a substitute for professional advice. If there is immediate danger, prioritize safety and contact local emergency services.")
+                infoCard(
+                    title: "Important Reminder",
+                    systemImage: "info.circle.fill",
+                    bullets: [
+                        "Pouch Cell Inspector is designed as an assistive screening and educational tool.",
+                        "If a battery appears damaged or unsafe, follow professional repair and safety guidance.",
+                        "If there is immediate danger, prioritize personal safety and contact local emergency services."
+                    ]
+                )
             }
             .padding(16)
         }

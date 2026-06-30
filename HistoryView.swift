@@ -76,9 +76,7 @@ struct HistoryView: View {
                     } label: {
                         Text("Clear History")
                     }
-                    .accessibilityLabel("Clear history")
-                    .accessibilityHint("Removes all saved classification results from this device.")
-                }
+                                    }
             }
         }
         .sheet(item: $selectedItem) { item in
@@ -90,13 +88,16 @@ struct HistoryView: View {
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
         }
-        .alert("Clear history?", isPresented: $showDeleteAllConfirmation) {
+        .alert("Are you sure you want to clear history?", isPresented: $showDeleteAllConfirmation) {
             Button("Clear", role: .destructive) {
                 historyStore.clearAll()
             }
             Button("Cancel", role: .cancel) { }
         } message: {
             Text("This removes saved classification results from this device. This action cannot be undone.")
+        }
+        .onAppear {
+            historyStore.applyCurrentSettings()
         }
     }
 

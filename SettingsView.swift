@@ -14,6 +14,7 @@ struct SettingsView: View {
 
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var speechStore: SpeechSettingsStore
+    @EnvironmentObject private var historyStore: ScanHistoryStore
     @EnvironmentObject private var theme: ThemeManager
     @Environment(\.colorScheme) private var systemScheme
 
@@ -24,6 +25,8 @@ struct SettingsView: View {
 
     // ✅ Privacy-friendly: OFF by default
     @AppStorage("pref_saveToPhotos") private var saveToPhotos: Bool = false
+    @AppStorage(ScanHistoryStore.saveClassificationsLocallyKey) private var saveClassificationsLocally: Bool = true
+    @AppStorage(ScanHistoryStore.historyRetentionKey) private var historyRetention: HistoryRetention = .forever
 
     // ✅ Haptics are OFF by default on first install (opt-in).
     @AppStorage("pref_haptics") private var haptics: Bool = false
@@ -47,35 +50,37 @@ struct SettingsView: View {
         NavigationStack {
             List {
                 Section("Accessibility") {
-                    Toggle("Speak results after scan", isOn: Binding(
+                    Toggle("Enable Spoken Results", isOn: Binding(
                         get: { speechStore.settings.isEnabled },
                         set: { newValue in
                             var s = speechStore.settings
                             s.isEnabled = newValue
                             speechStore.settings = s
-
+                            
                             if !newValue { SpeechManager.shared.stop() }
                         }
                     ))
-
-                    Text("The app can automatically read out the scan result after analysis.")
+                    .accessibilityLabel("Enable Spoken Results")
+                    .accessibilityHint("Automatically speaks the inspection result after each scan.")
+                    
+                    Text("Automatically speaks the inspection result after each scan.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
-
+                    
                     Toggle("Enable Haptics", isOn: $haptics)
-
+                    
                     Text("The app can use haptic feedback on the results screen (e.g., a stronger alert for bulging).")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
-
+                    
                     if speechStore.settings.isEnabled {
                         VStack(alignment: .leading, spacing: 12) {
-
+                            
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("Speech rate")
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
-
+                                
                                 Slider(
                                     value: Binding(
                                         get: { speechStore.settings.rate },
@@ -88,12 +93,12 @@ struct SettingsView: View {
                                     in: AVSpeechUtteranceMinimumSpeechRate...AVSpeechUtteranceMaximumSpeechRate
                                 )
                             }
-
+                            
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("Pitch")
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
-
+                                
                                 Slider(
                                     value: Binding(
                                         get: { speechStore.settings.pitch },
@@ -106,12 +111,12 @@ struct SettingsView: View {
                                     in: 0.5...2.0
                                 )
                             }
-
+                            
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("Voice")
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
-
+                                
                                 NavigationLink {
                                     VoiceSelectionView()
                                         .environmentObject(speechStore)
@@ -125,7 +130,7 @@ struct SettingsView: View {
                                     }
                                 }
                             }
-
+                            
                             Button {
                                 let sample = "Scan result reading is enabled."
                                 SpeechManager.shared.speak(sample, settings: speechStore.settings)
@@ -136,15 +141,45 @@ struct SettingsView: View {
                         .padding(.vertical, 6)
                     }
                 }
-
+                
                 Section("Capture") {
                     Toggle("Save to Photos", isOn: $saveToPhotos)
-
+                    
                     Text("Automatically save pictures you've scanned using your iPhone's camera.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
-                }
 
+                    Toggle("Save Classifications Locally", isOn: $saveClassificationsLocally)
+                        
+                    if saveClassificationsLocally {
+                        Menu {
+                            ForEach(HistoryRetention.retentionChoices) { option in
+                                Button {
+                                    historyRetention = option
+                                } label: {
+                                    if option == selectedHistoryRetention {
+                                        Label(option.title, systemImage: "checkmark")
+                                    } else {
+                                        Text(option.title)
+                                    }
+                                }
+                            }
+                        } label: {
+                            HStack {
+                                Text("History Retention")
+                                    .foregroundStyle(.primary)
+                                Spacer()
+                                Text(selectedHistoryRetention.title)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                                            }
+
+                    Text("See local classifications directly in your in-app history.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+                
                 Section("Appearance") {
                     Picker("App appearance", selection: $theme.appearance) {
                         ForEach(AppAppearance.allCases) { option in
@@ -155,16 +190,23 @@ struct SettingsView: View {
                         theme.apply()
                     }
                 }
-
+                
                 Section("Support") {
                     Button { openContactUs() } label: {
                         Label("Contact us", systemImage: "envelope")
                     }
 
+                                        
                     Button { openAppSettings() } label: {
                         Label("Open iOS Settings", systemImage: "gearshape")
                     }
-                    
+                    Button { openAppStoreReview() } label: {
+                        Label("Rate Us on the App Store", systemImage: "star")
+                    }
+
+                }
+                
+                Section("About"){
                                     NavigationLink {
                         AboutScreen()
                     } label: {
@@ -185,9 +227,8 @@ struct SettingsView: View {
                 }
 
                 Section {
-                    HStack {
+                    VStack(alignment: .leading, spacing: 4) {
                         Text("App Version")
-                        Spacer()
                         Text(appVersionString)
                             .foregroundColor(.secondary)
                     }
@@ -212,7 +253,35 @@ struct SettingsView: View {
             } message: {
                 Text("Please set up Mail on this device to send email from within the app.")
             }
+            .onChange(of: saveClassificationsLocally) { _, _ in
+                historyStore.applyCurrentSettings()
+            }
+            .onChange(of: historyRetention) { _, _ in
+                historyStore.applyCurrentSettings()
+            }
+            .onAppear {
+                normalizeLegacyOffRetention()
+            }
         }
+    }
+
+    private var historyRetentionBinding: Binding<HistoryRetention> {
+        Binding(
+            get: { selectedHistoryRetention },
+            set: { newValue in
+                historyRetention = newValue
+            }
+        )
+    }
+
+    private var selectedHistoryRetention: HistoryRetention {
+        historyRetention == .off ? .forever : historyRetention
+    }
+
+    private func normalizeLegacyOffRetention() {
+        guard historyRetention == .off else { return }
+        saveClassificationsLocally = false
+        historyRetention = .forever
     }
 
     private func openContactUs() {
@@ -228,10 +297,15 @@ struct SettingsView: View {
         UIApplication.shared.open(url)
     }
 
+    private func openAppStoreReview() {
+        guard let url = URL(string: "https://apps.apple.com/app/id6757132440?action=write-review") else { return }
+        UIApplication.shared.open(url)
+    }
+
     private var appVersionString: String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—"
-        return "\(version) (\(build))"
+        return "\(version), build \(build)"
     }
 }
 
@@ -275,7 +349,8 @@ struct MailComposerView: UIViewControllerRepresentable {
 }
 
 #Preview {
-    MenuView()
+    SettingsView()
         .environmentObject(SpeechSettingsStore.shared)
+        .environmentObject(ScanHistoryStore.shared)
         .environmentObject(ThemeManager.shared)
 }

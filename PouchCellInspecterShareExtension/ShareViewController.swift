@@ -193,29 +193,27 @@ final class ShareViewController: UIViewController {
     }
 
     private func openMainApp() {
-        requestContainingAppLaunch(with: ShareExtensionConfiguration.incomingURL)
-        extensionContext?.completeRequest(returningItems: nil, completionHandler: nil)
+        openContainingApp()
     }
 
-    @discardableResult
-    private func requestContainingAppLaunch(with url: URL) -> Bool {
-        let selector = NSSelectorFromString("openURL:")
-        let startingResponders: [UIResponder?] = [self, view, view.window]
+    private func openContainingApp() {
+        let url = ShareExtensionConfiguration.incomingURL
 
-        for startingResponder in startingResponders {
-            var responder = startingResponder
-
-            while let currentResponder = responder {
-                if currentResponder.responds(to: selector) {
-                    currentResponder.perform(selector, with: url)
-                    return true
+        var responder: UIResponder? = self
+        while let currentResponder = responder {
+            if let application = currentResponder as? UIApplication {
+                application.open(url, options: [:]) { [weak self] success in
+                    print("Opened containing app:", success)
+                    self?.extensionContext?.completeRequest(returningItems: nil, completionHandler: nil)
                 }
-
-                responder = currentResponder.next
+                return
             }
+
+            responder = currentResponder.next
         }
 
-        return false
+        print("Could not find UIApplication in responder chain")
+        extensionContext?.completeRequest(returningItems: nil, completionHandler: nil)
     }
 }
 
